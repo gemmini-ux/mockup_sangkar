@@ -109,6 +109,13 @@ class TemplateSangkar {
   final String harga;
   final int popularitas;
   final String status; // Aktif, Draft
+  final String dimensi;
+  final int layers;
+  final String versi;
+  final String dibuatOleh;
+  final String tanggalDibuat;
+  final String kategori;
+  final Map<String, int>? komponen;
 
   const TemplateSangkar({
     required this.id,
@@ -119,10 +126,15 @@ class TemplateSangkar {
     required this.harga,
     required this.popularitas,
     required this.status,
+    this.dimensi = '3200 x 4500 px',
+    this.layers = 24,
+    this.versi = '1.0',
+    this.dibuatOleh = 'Andi Setiawan',
+    this.tanggalDibuat = '22 Mei 2024',
+    this.kategori = 'Premium',
+    this.komponen,
   });
-}
-
-// ─────────────────────────────────────────────────────────────
+}// ─────────────────────────────────────────────────────────────
 // 6. PESANAN (Order)
 // ─────────────────────────────────────────────────────────────
 class Pesanan {
