@@ -31,6 +31,7 @@ import 'features/produksi/produksi_page.dart';
 import 'features/desain/desain_page.dart';
 import 'features/stok/stok_page.dart';
 import 'features/pelanggan/pelanggan_page.dart';
+import 'features/template/template_page.dart';
 
 class HomePageMc01 extends StatefulWidget {
   const HomePageMc01({super.key});
@@ -335,6 +336,8 @@ class _KontenUtama extends StatelessWidget {
 
     // Sub-halaman fungsional sesuai index menu
     switch (menuAktif) {
+      case 1: // Template
+        return const TemplatePage();
       case 2: // Desain
         return const DesainPage();
       case 5: // Komponen (Stok)

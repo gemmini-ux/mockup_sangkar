@@ -6,7 +6,8 @@ import 'package:mocupsangkar/features/mockup01/models/sangkar_models.dart';
 
 class PesananFormPage extends StatefulWidget {
   final Pesanan? order;
-  const PesananFormPage({super.key, this.order});
+  final TemplateSangkar? template;
+  const PesananFormPage({super.key, this.order, this.template});
 
   @override
   State<PesananFormPage> createState() => _PesananFormPageState();
@@ -62,6 +63,38 @@ class _PesananFormPageState extends State<PesananFormPage> {
       } catch (e) {
         _deadline = DateTime.now().add(const Duration(days: 7));
       }
+    } else if (widget.template != null) {
+      final t = widget.template!;
+      _selectedPelangganId = DummyDb.pelanggan.first.id;
+      _selectedPelangganNama = DummyDb.pelanggan.first.nama;
+
+      final jSangkar = DummyDb.jenisSangkar.firstWhere(
+        (s) => s.id == t.jenisSangkarId,
+        orElse: () => DummyDb.jenisSangkar.first,
+      );
+      _selectedSangkarId = jSangkar.id;
+      _selectedSangkarNama = jSangkar.nama;
+      _selectedSangkarBentuk = jSangkar.bentuk;
+      _bagianTersedia = jSangkar.bagian;
+
+      // Find motif of first decal
+      final firstDecalId = t.desainDecalIds.isNotEmpty ? t.desainDecalIds.first : '';
+      final decal = DummyDb.desainDecal.firstWhere(
+        (d) => d.id == firstDecalId,
+        orElse: () => DummyDb.desainDecal.first,
+      );
+      _selectedMotif = decal.motif;
+
+      // Select all parts where perluDecal is true
+      _selectedBagian = jSangkar.bagian
+          .where((b) => b.perluDecal)
+          .map((b) => b.nama)
+          .toList();
+
+      _qty = 1;
+      _ukuranKhusus = '';
+      _catatan = 'Dibuat dari templat preset: ${t.nama}';
+      _deadline = DateTime.now().add(const Duration(days: 7));
     } else {
       // Default initial states
       _selectedPelangganId = DummyDb.pelanggan.first.id;
