@@ -427,14 +427,14 @@ class _TemplatePageState extends State<TemplatePage> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Container(width: 1, height: 120, color: Colors.cyanAccent.withValues(alpha: 0.3)),
+                            Expanded(child: Container(width: 1, color: Colors.cyanAccent.withValues(alpha: 0.3))),
                             const SizedBox(height: 6),
                             Text(
                               t.dimensi.split('x').last.trim(),
                               style: const TextStyle(fontSize: 10, color: Colors.white54, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 6),
-                            Container(width: 1, height: 120, color: Colors.cyanAccent.withValues(alpha: 0.3)),
+                            Expanded(child: Container(width: 1, color: Colors.cyanAccent.withValues(alpha: 0.3))),
                           ],
                         ),
                       ),
@@ -446,14 +446,14 @@ class _TemplatePageState extends State<TemplatePage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Container(width: 70, height: 1, color: Colors.cyanAccent.withValues(alpha: 0.3)),
+                            Expanded(child: Container(height: 1, color: Colors.cyanAccent.withValues(alpha: 0.3))),
                             const SizedBox(width: 8),
                             Text(
                               t.dimensi.split('x').first.trim(),
                               style: const TextStyle(fontSize: 10, color: Colors.white54, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(width: 8),
-                            Container(width: 70, height: 1, color: Colors.cyanAccent.withValues(alpha: 0.3)),
+                            Expanded(child: Container(height: 1, color: Colors.cyanAccent.withValues(alpha: 0.3))),
                           ],
                         ),
                       ),
