@@ -56,8 +56,11 @@ class _TemplatePageState extends State<TemplatePage> {
           // ==========================================
           // TOP HEADER ROW
           // ==========================================
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            spacing: 16,
+            runSpacing: 12,
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,11 +77,14 @@ class _TemplatePageState extends State<TemplatePage> {
                 ],
               ),
               // Right Search + Actions
-              Row(
+              Wrap(
+                spacing: 10,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   // Search Input
                   SizedBox(
-                    width: 200,
+                    width: 180,
                     height: 36,
                     child: TextField(
                       style: const TextStyle(fontSize: 12, color: Colors.white),
@@ -105,7 +111,6 @@ class _TemplatePageState extends State<TemplatePage> {
                       },
                     ),
                   ),
-                  const SizedBox(width: 10),
                   // Filter Dropdown
                   Container(
                     height: 36,
@@ -130,7 +135,6 @@ class _TemplatePageState extends State<TemplatePage> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
                   // New Template Button
                   ElevatedButton.icon(
                     onPressed: () => _tampilkanDialogTemplateBaru(context),
@@ -151,18 +155,31 @@ class _TemplatePageState extends State<TemplatePage> {
           // ==========================================
           // STATS ROW (5 Cards)
           // ==========================================
-          Row(
-            children: [
-              _buildMiniStatCard('Total Template', '$totalCount', 'Template tersimpan', Icons.inventory_2_outlined, Colors.purpleAccent),
-              const SizedBox(width: 12),
-              _buildMiniStatCard('Draft', '$draftCount', 'Belum dipublish', Icons.edit_document, Colors.orangeAccent),
-              const SizedBox(width: 12),
-              _buildMiniStatCard('Publik', '$activeCount', 'Siap digunakan', Icons.public, Colors.greenAccent),
-              const SizedBox(width: 12),
-              _buildMiniStatCard('Paling Digunakan', mostUsed.nama.split(' ').first, 'Digunakan 342x', Icons.star_border, Colors.amberAccent),
-              const SizedBox(width: 12),
-              _buildMiniStatCard('Terakhir Dibuat', lastCreated.nama.split(' ').first, lastCreated.tanggalDibuat, Icons.update, Colors.cyanAccent),
-            ],
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final w = constraints.maxWidth;
+              int cardsPerRow = 5;
+              if (w < 600) {
+                cardsPerRow = 2;
+              } else if (w < 950) {
+                cardsPerRow = 3;
+              }
+              
+              final double spacing = 12;
+              final double cardWidth = (w - (spacing * (cardsPerRow - 1))) / cardsPerRow;
+              
+              return Wrap(
+                spacing: spacing,
+                runSpacing: spacing,
+                children: [
+                  _buildMiniStatCard('Total Template', '$totalCount', 'Template tersimpan', Icons.inventory_2_outlined, Colors.purpleAccent, width: cardWidth),
+                  _buildMiniStatCard('Draft', '$draftCount', 'Belum dipublish', Icons.edit_document, Colors.orangeAccent, width: cardWidth),
+                  _buildMiniStatCard('Publik', '$activeCount', 'Siap digunakan', Icons.public, Colors.greenAccent, width: cardWidth),
+                  _buildMiniStatCard('Paling Digunakan', mostUsed.nama.split(' ').first, 'Digunakan 342x', Icons.star_border, Colors.amberAccent, width: cardWidth),
+                  _buildMiniStatCard('Terakhir Dibuat', lastCreated.nama.split(' ').first, lastCreated.tanggalDibuat, Icons.update, Colors.cyanAccent, width: cardWidth),
+                ],
+              );
+            },
           ),
           const SizedBox(height: 20),
 
@@ -239,19 +256,35 @@ class _TemplatePageState extends State<TemplatePage> {
                               ),
                             )
                           : _isGridView
-                              ? GridView.builder(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: filteredTemplates.length,
-                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 3, // Changed from 2 to 3 columns to fit nicely!
-                                    crossAxisSpacing: 12,
-                                    mainAxisSpacing: 12,
-                                    childAspectRatio: 0.95,
-                                  ),
-                                  itemBuilder: (context, idx) {
-                                    final t = filteredTemplates[idx];
-                                    return _buildGridCard(t);
+                              ? LayoutBuilder(
+                                  builder: (context, gridConstraints) {
+                                    final gw = gridConstraints.maxWidth;
+                                    int crossAxisCount = 3;
+                                    double childAspectRatio = 0.80; // Taller card aspect ratio to accommodate content
+                                    
+                                    if (gw < 500) {
+                                      crossAxisCount = 1;
+                                      childAspectRatio = 1.15;
+                                    } else if (gw < 780) {
+                                      crossAxisCount = 2;
+                                      childAspectRatio = 0.82;
+                                    }
+                                    
+                                    return GridView.builder(
+                                      shrinkWrap: true,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      itemCount: filteredTemplates.length,
+                                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: crossAxisCount,
+                                        crossAxisSpacing: 12,
+                                        mainAxisSpacing: 12,
+                                        childAspectRatio: childAspectRatio,
+                                      ),
+                                      itemBuilder: (context, idx) {
+                                        final t = filteredTemplates[idx];
+                                        return _buildGridCard(t);
+                                      },
+                                    );
                                   },
                                 )
                               : ListView.separated(
@@ -724,36 +757,35 @@ class _TemplatePageState extends State<TemplatePage> {
   // METRICS & LAYOUT ROW BUILDERS
   // ==========================================
 
-  Widget _buildMiniStatCard(String title, String value, String desc, IconData icon, Color color) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: _glassDecoration(),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(icon, color: color, size: 18),
+  Widget _buildMiniStatCard(String title, String value, String desc, IconData icon, Color color, {required double width}) {
+    return Container(
+      width: width,
+      padding: const EdgeInsets.all(12),
+      decoration: _glassDecoration(),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: const TextStyle(fontSize: 9, color: Colors.white38)),
-                  const SizedBox(height: 2),
-                  Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
-                  const SizedBox(height: 1),
-                  Text(desc, style: const TextStyle(fontSize: 8, color: Colors.white54), overflow: TextOverflow.ellipsis),
-                ],
-              ),
+            child: Icon(icon, color: color, size: 18),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(fontSize: 9, color: Colors.white38), overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 2),
+                Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white), overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 1),
+                Text(desc, style: const TextStyle(fontSize: 8, color: Colors.white54), overflow: TextOverflow.ellipsis),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

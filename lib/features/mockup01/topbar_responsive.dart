@@ -25,6 +25,11 @@ class TopbarResponsive extends StatelessWidget {
 class _TopbarDesktop extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final w = MediaQuery.sizeOf(context).width;
+    final bool showFullAvatar = w >= 1220;
+    final bool showStatusDb = w >= 1100;
+    final bool showDate = w >= 980;
+
     return Container(
       height: 82,
       margin: const EdgeInsets.fromLTRB(20, 16, 20, 8),
@@ -55,18 +60,19 @@ class _TopbarDesktop extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Container(
-                    margin: const EdgeInsets.only(right: 10),
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white10,
-                      borderRadius: BorderRadius.circular(8),
+                  if (w >= 1080)
+                    Container(
+                      margin: const EdgeInsets.only(right: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white10,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        'CTRL+K',
+                        style: TextStyle(color: Colors.white38, fontSize: 10),
+                      ),
                     ),
-                    child: const Text(
-                      'CTRL+K',
-                      style: TextStyle(color: Colors.white38, fontSize: 10),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -75,27 +81,29 @@ class _TopbarDesktop extends StatelessWidget {
           const SizedBox(width: 20),
 
           // Tanggal
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                _tanggalHariIni(),
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
-              ),
-              Text(
-                _hariIni(),
-                style: const TextStyle(color: Colors.white54, fontSize: 11),
-              ),
-            ],
-          ),
-
-          const SizedBox(width: 20),
+          if (showDate) ...[
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _tanggalHariIni(),
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                ),
+                Text(
+                  _hariIni(),
+                  style: const TextStyle(color: Colors.white54, fontSize: 11),
+                ),
+              ],
+            ),
+            const SizedBox(width: 20),
+          ],
 
           // Status DB
-          _StatusChip(),
-
-          const SizedBox(width: 16),
+          if (showStatusDb) ...[
+            const _StatusChip(),
+            const SizedBox(width: 16),
+          ],
 
           _IkonBulat(Icons.notifications_none_outlined, badge: true),
           const SizedBox(width: 8),
@@ -107,7 +115,7 @@ class _TopbarDesktop extends StatelessWidget {
           Container(width: 1, height: 36, color: Colors.white12),
           const SizedBox(width: 16),
 
-          _AvatarUser(showLabel: true),
+          _AvatarUser(showLabel: showFullAvatar),
         ],
       ),
     );
