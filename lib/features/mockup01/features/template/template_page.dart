@@ -169,111 +169,109 @@ class _TemplatePageState extends State<TemplatePage> {
           // ==========================================
           // MAIN PANEL (Kategori Sidebar + Grid List)
           // ==========================================
-          IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Left Column: Kategori & Tags & Aksi Cepat
-                SizedBox(
-                  width: 180,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Left Column: Kategori & Tags & Aksi Cepat
+              SizedBox(
+                width: 180,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildLeftMenuSection('Kategori', [
+                      _buildCategoryRow('Semua Kategori', totalCount, Icons.grid_view_rounded),
+                      _buildCategoryRow('Premium', 38, Icons.workspace_premium_outlined),
+                      _buildCategoryRow('Minimalis', 24, Icons.square_foot_outlined),
+                      _buildCategoryRow('Classic', 18, Icons.auto_awesome_outlined),
+                      _buildCategoryRow('Lengkung', 22, Icons.circle_outlined),
+                      _buildCategoryRow('Kotak', 16, Icons.check_box_outline_blank_rounded),
+                    ]),
+                    const SizedBox(height: 16),
+                    _buildLeftTagSection('Tag Populer', [
+                      'Premium', 'Lengkung', 'Elegan',
+                      'Minimalis', 'Kotak', 'Modern',
+                      'Gold', 'Classic'
+                    ]),
+                    const SizedBox(height: 16),
+                    _buildLeftActionSection('Aksi Cepat'),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+
+              // Center Column: Template Grid (Larger width now, fits 3 columns!)
+              Expanded(
+                child: Container(
+                  constraints: const BoxConstraints(minHeight: 485), // Align height with left column safely
+                  padding: const EdgeInsets.all(16),
+                  decoration: _glassDecoration(),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildLeftMenuSection('Kategori', [
-                        _buildCategoryRow('Semua Kategori', totalCount, Icons.grid_view_rounded),
-                        _buildCategoryRow('Premium', 38, Icons.workspace_premium_outlined),
-                        _buildCategoryRow('Minimalis', 24, Icons.square_foot_outlined),
-                        _buildCategoryRow('Classic', 18, Icons.auto_awesome_outlined),
-                        _buildCategoryRow('Lengkung', 22, Icons.circle_outlined),
-                        _buildCategoryRow('Kotak', 16, Icons.check_box_outline_blank_rounded),
-                      ]),
-                      const SizedBox(height: 16),
-                      _buildLeftTagSection('Tag Populer', [
-                        'Premium', 'Lengkung', 'Elegan',
-                        'Minimalis', 'Kotak', 'Modern',
-                        'Gold', 'Classic'
-                      ]),
-                      const SizedBox(height: 16),
-                      _buildLeftActionSection('Aksi Cepat'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Semua Template',
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                          // View Switcher
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () => setState(() => _isGridView = true),
+                                icon: Icon(Icons.grid_on_rounded, size: 16, color: _isGridView ? Colors.cyanAccent : Colors.white30),
+                              ),
+                              IconButton(
+                                onPressed: () => setState(() => _isGridView = false),
+                                icon: Icon(Icons.list_alt_rounded, size: 16, color: !_isGridView ? Colors.cyanAccent : Colors.white30),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      filteredTemplates.isEmpty
+                          ? const Center(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: 40),
+                                child: Text('Tidak ada template cocok.', style: TextStyle(color: Colors.white38, fontSize: 12)),
+                              ),
+                            )
+                          : _isGridView
+                              ? GridView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: filteredTemplates.length,
+                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3, // Changed from 2 to 3 columns to fit nicely!
+                                    crossAxisSpacing: 12,
+                                    mainAxisSpacing: 12,
+                                    childAspectRatio: 0.95,
+                                  ),
+                                  itemBuilder: (context, idx) {
+                                    final t = filteredTemplates[idx];
+                                    return _buildGridCard(t);
+                                  },
+                                )
+                              : ListView.separated(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: filteredTemplates.length,
+                                  separatorBuilder: (context, index) => const Divider(color: Colors.white10),
+                                  itemBuilder: (context, idx) {
+                                    final t = filteredTemplates[idx];
+                                    return _buildListRow(t);
+                                  },
+                                ),
+                      const SizedBox(height: 20),
+                      // Pagination
+                      _buildPagination(),
                     ],
                   ),
                 ),
-                const SizedBox(width: 16),
-  
-                // Center Column: Template Grid (Larger width now, fits 3 columns!)
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: _glassDecoration(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Semua Template',
-                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white),
-                            ),
-                            // View Switcher
-                            Row(
-                              children: [
-                                IconButton(
-                                  onPressed: () => setState(() => _isGridView = true),
-                                  icon: Icon(Icons.grid_on_rounded, size: 16, color: _isGridView ? Colors.cyanAccent : Colors.white30),
-                                ),
-                                IconButton(
-                                  onPressed: () => setState(() => _isGridView = false),
-                                  icon: Icon(Icons.list_alt_rounded, size: 16, color: !_isGridView ? Colors.cyanAccent : Colors.white30),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        filteredTemplates.isEmpty
-                            ? const Center(
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 40),
-                                  child: Text('Tidak ada template cocok.', style: TextStyle(color: Colors.white38, fontSize: 12)),
-                                ),
-                              )
-                            : _isGridView
-                                ? GridView.builder(
-                                    shrinkWrap: true,
-                                    physics: const NeverScrollableScrollPhysics(),
-                                    itemCount: filteredTemplates.length,
-                                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 3, // Changed from 2 to 3 columns to fit nicely!
-                                      crossAxisSpacing: 12,
-                                      mainAxisSpacing: 12,
-                                      childAspectRatio: 0.95,
-                                    ),
-                                    itemBuilder: (context, idx) {
-                                      final t = filteredTemplates[idx];
-                                      return _buildGridCard(t);
-                                    },
-                                  )
-                                : ListView.separated(
-                                    shrinkWrap: true,
-                                    physics: const NeverScrollableScrollPhysics(),
-                                    itemCount: filteredTemplates.length,
-                                    separatorBuilder: (context, index) => const Divider(color: Colors.white10),
-                                    itemBuilder: (context, idx) {
-                                      final t = filteredTemplates[idx];
-                                      return _buildListRow(t);
-                                    },
-                                  ),
-                        const Spacer(), // Use Spacer to push pagination to the bottom if container is stretched!
-                        const SizedBox(height: 20),
-                        // Pagination
-                        _buildPagination(),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
           const SizedBox(height: 24),
 
