@@ -1,37 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/order_controller.dart';
 
 class ProjectPanel extends StatelessWidget {
   const ProjectPanel({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final orders = [
-      {
-        "kode": "SGK-001",
-        "nama": "Murai Borneo Premium",
-        "status": "Printing",
-        "qty": "25",
-      },
-      {
-        "kode": "SGK-002",
-        "nama": "Lovebird Elegan",
-        "status": "Cutting",
-        "qty": "18",
-      },
-      {"kode": "SGK-003", "nama": "Kacer Hexagon", "status": "QC", "qty": "12"},
-      {
-        "kode": "SGK-004",
-        "nama": "Kenari Minimalis",
-        "status": "Packing",
-        "qty": "30",
-      },
-      {
-        "kode": "SGK-005",
-        "nama": "Anis Merah Luxury",
-        "status": "Desain",
-        "qty": "15",
-      },
-    ];
+    final OrderController controller = Get.find<OrderController>();
 
     return Container(
       height: 420,
@@ -40,7 +16,7 @@ class ProjectPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             "ANTRIAN PRODUKSI",
             style: TextStyle(
               color: Colors.white,
@@ -48,53 +24,63 @@ class ProjectPanel extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Text("Lihat Semua", style: TextStyle(color: Colors.white54)),
-          ),
-
           const SizedBox(height: 20),
 
           Expanded(
-            child: ListView.separated(
-              itemCount: orders.length,
-              separatorBuilder: (_, _) => const Divider(color: Colors.white10),
-              itemBuilder: (context, index) {
-                final item = orders[index];
+            child: Obx(() {
+              final activeOrders = controller.orders.take(5).toList();
 
-                return ListTile(
-                  contentPadding: EdgeInsets.zero,
-
-                  leading: Container(
-                    width: 52,
-                    height: 52,
-                    decoration: BoxDecoration(
-                      color: Colors.white10,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      Icons.catching_pokemon,
-                      color: Colors.orangeAccent,
-                    ),
+              if (activeOrders.isEmpty) {
+                return const Center(
+                  child: Text(
+                    "Tidak ada antrean aktif",
+                    style: TextStyle(color: Colors.white38, fontSize: 12),
                   ),
-
-                  title: Text(
-                    item["nama"]!,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-
-                  subtitle: Text(
-                    "${item["kode"]} • Qty ${item["qty"]}",
-                    style: const TextStyle(color: Colors.white54),
-                  ),
-
-                  trailing: _status(item["status"]!),
                 );
-              },
-            ),
+              }
+
+              return ListView.separated(
+                itemCount: activeOrders.length,
+                separatorBuilder: (_, _) => const Divider(color: Colors.white10),
+                itemBuilder: (context, index) {
+                  final item = activeOrders[index];
+
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                    leading: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: Colors.white10,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.bookmark_added_outlined,
+                        color: Colors.cyanAccent,
+                        size: 20,
+                      ),
+                    ),
+
+                    title: Text(
+                      item.jenisSangkar,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                    ),
+
+                    subtitle: Text(
+                      "${item.kode} • Qty ${item.qty} · ${item.pelangganNama}",
+                      style: const TextStyle(color: Colors.white54, fontSize: 10),
+                    ),
+
+                    trailing: _status(item.statusProduksi),
+                  );
+                },
+              );
+            }),
           ),
         ],
       ),

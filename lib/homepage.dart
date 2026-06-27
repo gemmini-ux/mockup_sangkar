@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'features/mockup01/homepage_mc01.dart';
+import 'features/mockup02/homepage_mc02.dart';
+import 'features/mockup03/homepage_mc03.dart';
+import 'features/mockup04/homepage_mc04.dart';
 import 'features/mockup05/homepage_mc05.dart';
 import 'features/mockup06/homepage_mc06.dart';
 import 'features/mockup07/homepage_mc07.dart';
@@ -21,15 +24,15 @@ class HomePage extends StatelessWidget {
 
     final pages = [
       const HomePageMc01(),  // 01 — Cyber Dark Blue    ✅ Lengkap
-      const HomePageMc01(),  // 02 — Neon Purple         🔲 Coming Soon
-      const HomePageMc01(),  // 03 — Clean Minimalist    🔲 Coming Soon
-      const HomePageMc01(),  // 04 — Retro Amber         🔲 Coming Soon
-      const HomePageMc05(),  // 05 — Oceanic Teal        🔲 Placeholder
-      const HomePageMc06(),  // 06 — Forest Green        🔲 Placeholder
-      const HomePageMc07(),  // 07 — Metallic Crimson    🔲 Placeholder
-      const HomePageMc08(),  // 08 — Sakura Pink         🔲 Placeholder
-      const HomePageMc09(),  // 09 — Cyberpunk Yellow    🔲 Placeholder
-      const HomePageMc10(),  // 10 — Monochrome Glass    🔲 Placeholder
+      const HomePageMc02(),  // 02 — Neon Purple         🔲 Draf
+      const HomePageMc03(),  // 03 — Clean Minimalist    🔲 Draf
+      const HomePageMc04(),  // 04 — Retro Amber         🔲 Draf
+      const HomePageMc05(),  // 05 — Oceanic Teal        🔲 Draf
+      const HomePageMc06(),  // 06 — Forest Green        🔲 Draf
+      const HomePageMc07(),  // 07 — Metallic Crimson    🔲 Draf
+      const HomePageMc08(),  // 08 — Sakura Pink         🔲 Draf
+      const HomePageMc09(),  // 09 — Cyberpunk Yellow    🔲 Draf
+      const HomePageMc10(),  // 10 — Monochrome Glass    🔲 Draf
     ];
 
     return Scaffold(

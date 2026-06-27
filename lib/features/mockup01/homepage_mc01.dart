@@ -7,6 +7,7 @@
 // Mobile  (<600px)  : Drawer + navigasi bawah + konten 1 kolom
 // ============================================================
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:mocupsangkar/core/responsive.dart';
 
 import 'sidebar_responsive.dart';
@@ -22,6 +23,15 @@ import 'halaman dashboard/production_card.dart';
 import 'halaman dashboard/quick_access_card.dart';
 import 'halaman dashboard/notification_card.dart';
 
+import 'controllers/order_controller.dart';
+import 'controllers/stock_controller.dart';
+import 'pages/placeholder_page.dart';
+import 'pages/pesanan_page.dart';
+import 'pages/produksi_page.dart';
+import 'pages/desain_page.dart';
+import 'pages/stok_page.dart';
+import 'pages/pelanggan_page.dart';
+
 class HomePageMc01 extends StatefulWidget {
   const HomePageMc01({super.key});
 
@@ -34,8 +44,67 @@ class _HomePageMc01State extends State<HomePageMc01> {
   int _navBawahAktif = 0;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
-  void _pilihMenu(int i) => setState(() => _menuAktif = i);
-  void _pilihNavBawah(int i) => setState(() => _navBawahAktif = i);
+  @override
+  void initState() {
+    super.initState();
+    // Safety check to prevent duplicate bindings registration in GetX
+    if (!Get.isRegistered<OrderController>()) {
+      Get.put(OrderController());
+    }
+    if (!Get.isRegistered<StockController>()) {
+      Get.put(StockController());
+    }
+  }
+
+  void _pilihMenu(int i) {
+    setState(() {
+      _menuAktif = i;
+      // Sync bottom navigation index
+      switch (i) {
+        case 0:
+          _navBawahAktif = 0;
+          break;
+        case 9:
+          _navBawahAktif = 1;
+          break;
+        case 10:
+          _navBawahAktif = 2;
+          break;
+        case 5:
+          _navBawahAktif = 3; // Komponen maps to Stok page
+          break;
+        case 11:
+          _navBawahAktif = 4;
+          break;
+        default:
+          _navBawahAktif = -1; // Deselected in bottom nav
+      }
+    });
+  }
+
+  void _pilihNavBawah(int i) {
+    setState(() {
+      _navBawahAktif = i;
+      // Sync menu index
+      switch (i) {
+        case 0:
+          _menuAktif = 0;
+          break;
+        case 1:
+          _menuAktif = 9;
+          break;
+        case 2:
+          _menuAktif = 10;
+          break;
+        case 3:
+          _menuAktif = 5;
+          break;
+        case 4:
+          _menuAktif = 11;
+          break;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +153,7 @@ class _DesktopLayout extends StatelessWidget {
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(20),
-                    child: _KontenDashboard(tipe: TipeLayar.desktop),
+                    child: _KontenUtama(menuAktif: menuAktif, tipe: TipeLayar.desktop),
                   ),
                 ),
               ],
@@ -121,7 +190,7 @@ class _TabletLayout extends StatelessWidget {
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(16),
-                    child: _KontenDashboard(tipe: TipeLayar.tablet),
+                    child: _KontenUtama(menuAktif: menuAktif, tipe: TipeLayar.tablet),
                   ),
                 ),
               ],
@@ -169,7 +238,7 @@ class _MobileLayout extends StatelessWidget {
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(12),
-                child: _KontenDashboard(tipe: TipeLayar.mobile),
+                child: _KontenUtama(menuAktif: menuAktif, tipe: TipeLayar.mobile),
               ),
             ),
           ],
@@ -244,21 +313,58 @@ class _NavBawah extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────
-// KONTEN DASHBOARD — adaptif berdasarkan TipeLayar
+// KONTEN UTAMA — adaptif berdasarkan TipeLayar & Menu Aktif
 // ─────────────────────────────────────────────────────────────
-class _KontenDashboard extends StatelessWidget {
+class _KontenUtama extends StatelessWidget {
+  final int menuAktif;
   final TipeLayar tipe;
-  const _KontenDashboard({required this.tipe});
+  const _KontenUtama({required this.menuAktif, required this.tipe});
 
   @override
   Widget build(BuildContext context) {
-    switch (tipe) {
-      case TipeLayar.desktop:
-        return _KontenDesktop();
-      case TipeLayar.tablet:
-        return _KontenTablet();
-      case TipeLayar.mobile:
-        return _KontenMobile();
+    if (menuAktif == 0) {
+      switch (tipe) {
+        case TipeLayar.desktop:
+          return _KontenDesktop();
+        case TipeLayar.tablet:
+          return _KontenTablet();
+        case TipeLayar.mobile:
+          return _KontenMobile();
+      }
+    }
+
+    // Sub-halaman fungsional sesuai index menu
+    switch (menuAktif) {
+      case 2: // Desain
+        return const DesainPage();
+      case 5: // Komponen (Stok)
+        return const StokPage();
+      case 9: // Produksi
+        return const ProduksiPage();
+      case 10: // Pesanan
+        return const PesananPage();
+      case 11: // Pelanggan
+        return const PelangganPage();
+      default:
+        // Render placeholder untuk draf menu lainnya
+        final titles = [
+          'Dashboard',
+          'Template',
+          'Desain',
+          'Tema & Style',
+          'Ornamen',
+          'Komponen / Stok',
+          'AI Prompt',
+          'Mapping Editor',
+          'Preview 3D',
+          'Produksi',
+          'Pesanan',
+          'Pelanggan',
+          'Laporan',
+          'Pengaturan'
+        ];
+        final title = menuAktif < titles.length ? titles[menuAktif] : 'Halaman';
+        return PlaceholderPage(title: title);
     }
   }
 }

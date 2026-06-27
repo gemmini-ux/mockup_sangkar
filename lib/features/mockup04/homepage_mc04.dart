@@ -1,0 +1,143 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+// ============================================================
+// HOMEPAGE MOCKUP 04 — Retro Amber
+// Background : #1A1000  |  Accent: Colors.amber
+// Navigasi   : Right Sidebar
+// Font       : Poppins (global dari main.dart)
+// ============================================================
+
+class HomePageMc04 extends StatefulWidget {
+  const HomePageMc04({super.key});
+
+  @override
+  State<HomePageMc04> createState() => _HomePageMc04State();
+}
+
+class _HomePageMc04State extends State<HomePageMc04> {
+  int _aktifIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF1A1000),
+      body: Row(
+        children: [
+          // Body (Left side)
+          Expanded(
+            child: Column(
+              children: [
+                AppBar(
+                  backgroundColor: const Color(0xFF261800),
+                  elevation: 0,
+                  leading: IconButton(
+                    icon: const Icon(Icons.arrow_back_ios_rounded, color: Colors.amber),
+                    onPressed: () => Get.back(),
+                  ),
+                  title: const Text(
+                    'Retro Amber',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.radar_rounded,
+                          size: 72,
+                          color: Colors.amber.withValues(alpha: 0.8),
+                        ),
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Retro Amber',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Right Sidebar · Vintage Grid Layout · Fade + Sepia',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 12,
+                            color: Colors.white54,
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                        const Text(
+                          '🚧  Sedang dikembangkan (Draf)',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 12,
+                            color: Colors.amber,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Sidebar (Right side)
+          Container(
+            width: 200,
+            color: const Color(0xFF261800),
+            child: Column(
+              children: [
+                const SizedBox(height: 48),
+                const Text(
+                  'NAVIGASI',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white30,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _buildSidebarItem(Icons.dashboard_outlined, 'Dashboard', 0),
+                _buildSidebarItem(Icons.precision_manufacturing_outlined, 'Produksi', 1),
+                _buildSidebarItem(Icons.shopping_cart_outlined, 'Pesanan', 2),
+                _buildSidebarItem(Icons.inventory_2_outlined, 'Stok', 3),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSidebarItem(IconData icon, String label, int index) {
+    final a = index == _aktifIndex;
+    return ListTile(
+      trailing: Icon(icon, color: a ? Colors.amber : Colors.white30, size: 20),
+      title: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          label,
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 12,
+            color: a ? Colors.amber : Colors.white70,
+            fontWeight: a ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
+      onTap: () => setState(() => _aktifIndex = index),
+    );
+  }
+}
