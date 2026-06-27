@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:mocupsangkar/data/dummy_db.dart';
-import 'package:mocupsangkar/models/sangkar_models.dart';
+import 'package:mocupsangkar/features/mockup01/data/dummy_db.dart';
+import 'package:mocupsangkar/features/mockup01/models/sangkar_models.dart';
 
 class StockController extends GetxController {
   // Reactive list of stock items
@@ -33,3 +33,4 @@ class StockController extends GetxController {
     }
   }
 }
+

@@ -8,29 +8,29 @@
 // ============================================================
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mocupsangkar/core/responsive.dart';
+import 'package:mocupsangkar/features/mockup01/core/responsive.dart';
 
 import 'sidebar_responsive.dart';
 import 'topbar_responsive.dart';
 import 'stat_card.dart';
-import 'halaman dashboard/dashboard.dart';
-import 'halaman dashboard/project_panel.dart';
-import 'halaman dashboard/activity_panel.dart';
-import 'halaman dashboard/schedule_panel.dart';
-import 'halaman dashboard/analytics_card.dart';
-import 'halaman dashboard/donut_chart_card.dart';
-import 'halaman dashboard/production_card.dart';
-import 'halaman dashboard/quick_access_card.dart';
-import 'halaman dashboard/notification_card.dart';
+import 'features/dashboard/dashboard.dart';
+import 'features/dashboard/project_panel.dart';
+import 'features/dashboard/activity_panel.dart';
+import 'features/dashboard/schedule_panel.dart';
+import 'features/dashboard/analytics_card.dart';
+import 'features/dashboard/donut_chart_card.dart';
+import 'features/dashboard/production_card.dart';
+import 'features/dashboard/quick_access_card.dart';
+import 'features/dashboard/notification_card.dart';
 
 import 'controllers/order_controller.dart';
 import 'controllers/stock_controller.dart';
-import 'pages/placeholder_page.dart';
-import 'pages/pesanan_page.dart';
-import 'pages/produksi_page.dart';
-import 'pages/desain_page.dart';
-import 'pages/stok_page.dart';
-import 'pages/pelanggan_page.dart';
+import 'features/placeholder/placeholder_page.dart';
+import 'features/pesanan/pesanan_page.dart';
+import 'features/produksi/produksi_page.dart';
+import 'features/desain/desain_page.dart';
+import 'features/stok/stok_page.dart';
+import 'features/pelanggan/pelanggan_page.dart';
 
 class HomePageMc01 extends StatefulWidget {
   const HomePageMc01({super.key});
@@ -640,3 +640,4 @@ class _StatCardWrap extends StatelessWidget {
     );
   }
 }
+

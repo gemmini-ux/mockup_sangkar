@@ -442,3 +442,4 @@ List<(IconData, String)> _menus() => [
   (Icons.bar_chart_outlined,             'Laporan'),
   (Icons.settings_outlined,              'Pengaturan'),
 ];
+

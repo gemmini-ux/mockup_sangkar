@@ -355,3 +355,4 @@ String _hariIni() {
   final hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
   return hari[DateTime.now().weekday % 7];
 }
+
