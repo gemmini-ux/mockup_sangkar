@@ -1,8 +1,8 @@
-/// ============================================================
-/// SANGKAR DECAL PRODUCTION — DUMMY DATABASE
-/// Data dummy lengkap untuk semua menu dalam aplikasi
-/// Gunakan file ini sebagai sumber data untuk seluruh widget
-/// ============================================================
+// ============================================================
+// SANGKAR DECAL PRODUCTION — DUMMY DATABASE
+// Data dummy lengkap untuk semua menu dalam aplikasi
+// Gunakan file ini sebagai sumber data untuk seluruh widget
+// ============================================================
 
 import 'package:mocupsangkar/models/sangkar_models.dart';
 

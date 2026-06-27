@@ -1,7 +1,7 @@
-/// ============================================================
-/// SANGKAR DECAL PRODUCTION — MODEL CLASSES
-/// Semua entitas data untuk aplikasi produksi decal sangkar burung
-/// ============================================================
+// ============================================================
+// SANGKAR DECAL PRODUCTION — MODEL CLASSES
+// Semua entitas data untuk aplikasi produksi decal sangkar burung
+// ============================================================
 
 // ─────────────────────────────────────────────────────────────
 // 1. PELANGGAN (Customer)
