@@ -17,30 +17,30 @@ class _TemplatePageState extends State<TemplatePage> {
   String _statusFilter = 'Semua';
   bool _isGridView = true;
 
-  // Track the selected template for the right detail panel
-  TemplateSangkar? _selectedTemplate;
+  // Track if we are viewing the dedicated detail page
+  TemplateSangkar? _viewingDetailTemplate;
 
-  @override
-  void initState() {
-    super.initState();
-    // Default select the first active template
-    if (DummyDb.template.isNotEmpty) {
-      _selectedTemplate = DummyDb.template.first;
-    }
-  }
+  // Active tab in the detail page
+  String _activeDetailTab = 'Komponen';
 
   @override
   Widget build(BuildContext context) {
+    // If a template is selected for detail view, render the dedicated Detail Page
+    if (_viewingDetailTemplate != null) {
+      return _buildDedicatedDetailPage(_viewingDetailTemplate!);
+    }
+
+    // Otherwise, render the main Template Dashboard/Grid
     final listTemplate = DummyDb.template;
 
-    // 1. Calculate stats dynamically
+    // Calculate stats dynamically
     final totalCount = listTemplate.length;
     final draftCount = listTemplate.where((t) => t.status == 'Draft').length;
     final activeCount = listTemplate.where((t) => t.status == 'Aktif').length;
     final mostUsed = listTemplate.first; // Premium Lengkung 50
     final lastCreated = listTemplate.firstWhere((t) => t.nama.contains('Minimalis'), orElse: () => listTemplate.first);
 
-    // 2. Filter templates
+    // Filter templates
     final filteredTemplates = listTemplate.where((t) {
       final matchSearch = t.nama.toLowerCase().contains(_searchQuery);
       final matchCategory = _selectedCategory == 'Semua Kategori' || t.kategori == _selectedCategory;
@@ -167,7 +167,7 @@ class _TemplatePageState extends State<TemplatePage> {
           const SizedBox(height: 20),
 
           // ==========================================
-          // MAIN PANEL (Split View)
+          // MAIN PANEL (Kategori Sidebar + Grid List)
           // ==========================================
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -199,7 +199,7 @@ class _TemplatePageState extends State<TemplatePage> {
               ),
               const SizedBox(width: 16),
 
-              // Center Column: Template Grid
+              // Center Column: Template Grid (Larger width now, fits 3 columns!)
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(16),
@@ -243,7 +243,7 @@ class _TemplatePageState extends State<TemplatePage> {
                                   physics: const NeverScrollableScrollPhysics(),
                                   itemCount: filteredTemplates.length,
                                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
+                                    crossAxisCount: 3, // Changed from 2 to 3 columns to fit nicely!
                                     crossAxisSpacing: 12,
                                     mainAxisSpacing: 12,
                                     childAspectRatio: 0.95,
@@ -269,20 +269,6 @@ class _TemplatePageState extends State<TemplatePage> {
                     ],
                   ),
                 ),
-              ),
-              const SizedBox(width: 16),
-
-              // Right Column: Detail Panel
-              SizedBox(
-                width: 320,
-                child: _selectedTemplate == null
-                    ? Container(
-                        height: 520,
-                        alignment: Alignment.center,
-                        decoration: _glassDecoration(),
-                        child: const Text('Pilih template untuk melihat detail', style: TextStyle(color: Colors.white38, fontSize: 12)),
-                      )
-                    : _buildDetailPanel(_selectedTemplate!),
               ),
             ],
           ),
@@ -377,7 +363,364 @@ class _TemplatePageState extends State<TemplatePage> {
   }
 
   // ==========================================
-  // WIDGET BUILDERS
+  // DEDICATED DETAIL PAGE (Workflow / Navigasi)
+  // ==========================================
+  Widget _buildDedicatedDetailPage(TemplateSangkar t) {
+    final isAktif = t.status == 'Aktif';
+    final sangkar = DummyDb.jenisSangkar.firstWhere((s) => s.id == t.jenisSangkarId, orElse: () => DummyDb.jenisSangkar.first);
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: _glassDecoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 1. Back button & Top Navigation
+          InkWell(
+            onTap: () {
+              setState(() {
+                _viewingDetailTemplate = null; // Go back to dashboard grid
+              });
+            },
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.arrow_back_ios_rounded, color: Colors.cyanAccent, size: 14),
+                const SizedBox(width: 6),
+                const Text(
+                  'Kembali',
+                  style: TextStyle(color: Colors.cyanAccent, fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // 2. Main Detail Section (Row of Preview & Right Info panel)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Left side: Large Frame Preview
+              Expanded(
+                child: Container(
+                  height: 380,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF060D1A),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.cyan.withValues(alpha: 0.2)),
+                  ),
+                  child: Stack(
+                    children: [
+                      Center(
+                        child: CustomPaint(
+                          size: const Size(double.infinity, double.infinity),
+                          painter: BirdcageFramePainter(shape: sangkar.bentuk, color: Colors.cyanAccent),
+                        ),
+                      ),
+                      // Height dimensions marker line
+                      Positioned(
+                        right: 15,
+                        top: 40,
+                        bottom: 40,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(width: 1, height: 120, color: Colors.cyanAccent.withValues(alpha: 0.3)),
+                            const SizedBox(height: 6),
+                            Text(
+                              t.dimensi.split('x').last.trim(),
+                              style: const TextStyle(fontSize: 10, color: Colors.white54, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 6),
+                            Container(width: 1, height: 120, color: Colors.cyanAccent.withValues(alpha: 0.3)),
+                          ],
+                        ),
+                      ),
+                      // Width dimensions marker line
+                      Positioned(
+                        bottom: 15,
+                        left: 40,
+                        right: 40,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(width: 70, height: 1, color: Colors.cyanAccent.withValues(alpha: 0.3)),
+                            const SizedBox(width: 8),
+                            Text(
+                              t.dimensi.split('x').first.trim(),
+                              style: const TextStyle(fontSize: 10, color: Colors.white54, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(width: 70, height: 1, color: Colors.cyanAccent.withValues(alpha: 0.3)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 24),
+
+              // Right side: Name, Status, Action row & Informasi
+              SizedBox(
+                width: 360,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header title & badge
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            t.nama,
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: isAktif ? Colors.green.withValues(alpha: 0.15) : Colors.orange.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: isAktif ? Colors.greenAccent : Colors.orangeAccent, width: 0.5),
+                          ),
+                          child: Text(
+                            t.status.toUpperCase(),
+                            style: TextStyle(fontSize: 9, color: isAktif ? Colors.greenAccent : Colors.orangeAccent, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        _buildCategoryPill(t.kategori),
+                        const SizedBox(width: 6),
+                        const Text('Tampilan', style: TextStyle(fontSize: 10, color: Colors.white38)),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Actions Row 1 (Edit, Tampilan)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () {},
+                            icon: const Icon(Icons.edit, size: 14),
+                            label: const Text('Edit', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF101B2D),
+                              foregroundColor: Colors.white,
+                              side: const BorderSide(color: Colors.white10),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () {},
+                            icon: const Icon(Icons.palette_outlined, size: 14, color: Colors.greenAccent),
+                            label: const Text('Tampilan', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.greenAccent)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF101B2D),
+                              foregroundColor: Colors.greenAccent,
+                              side: BorderSide(color: Colors.greenAccent.withValues(alpha: 0.3)),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Actions Row 2 (Duplicate, Export, Hapus)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildDetailActionButton(Icons.copy, 'Duplicate', () {}),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: _buildDetailActionButton(Icons.ios_share_outlined, 'Export', () {}),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: _buildDetailActionButton(Icons.delete_outline, 'Hapus', () {}, isRed: true),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Informasi List
+                    const Text('Informasi', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white)),
+                    const SizedBox(height: 10),
+                    _buildInfoRow('Kategori', t.kategori),
+                    _buildInfoRow('Jenis Bentuk', sangkar.bentuk),
+                    _buildInfoRow('Ukuran', t.dimensi),
+                    _buildInfoRow('Layer', '${t.layers} Layer'),
+                    _buildInfoRow('Versi', t.versi),
+                    _buildInfoRow('Dibuat', t.tanggalDibuat),
+                    _buildInfoRow('Diperbarui', t.tanggalDibuat), // Simulating updated date
+                    _buildInfoRow('Dibuat oleh', t.dibuatOleh),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+
+          // 3. Bottom Tab Menu: Komponen, Preview, Riwayat Versi, Penggunaan
+          Row(
+            children: ['Komponen', 'Preview', 'Riwayat Versi', 'Penggunaan'].map((tab) {
+              final isTabSelected = _activeDetailTab == tab;
+              return InkWell(
+                onTap: () => setState(() => _activeDetailTab = tab),
+                child: Container(
+                  margin: const EdgeInsets.only(right: 24),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: isTabSelected ? Colors.cyanAccent : Colors.transparent,
+                        width: 2.0,
+                      ),
+                    ),
+                  ),
+                  child: Text(
+                    tab,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: isTabSelected ? FontWeight.bold : FontWeight.normal,
+                      color: isTabSelected ? Colors.cyanAccent : Colors.white60,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+          const Divider(color: Colors.white10, height: 1),
+          const SizedBox(height: 16),
+
+          // 4. Tab Contents
+          _activeDetailTab == 'Komponen'
+              ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Left Column: Komponen Template List
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF101B2D),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Komponen Template', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white)),
+                            const SizedBox(height: 12),
+                            _buildComponentRow('Frame', 1),
+                            _buildComponentRow('Ornamen', t.layers ~/ 2),
+                            _buildComponentRow('Area Foto', 1),
+                            _buildComponentRow('Area Teks', 4),
+                            _buildComponentRow('Background', 1),
+                            _buildComponentRow('Logo', 1),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 24),
+                    // Right Column: Thumbnail Preview Box
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF101B2D),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text('Thumbnail', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white)),
+                                IconButton(
+                                  onPressed: () {},
+                                  icon: const Icon(Icons.edit_outlined, size: 14, color: Colors.cyanAccent),
+                                  style: IconButton.styleFrom(
+                                    backgroundColor: const Color(0xFF091121),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                    minimumSize: Size.zero,
+                                    padding: const EdgeInsets.all(6),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            // Large preview box in thumbnail style
+                            Container(
+                              height: 120,
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF060D1A),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: CustomPaint(
+                                painter: BirdcageFramePainter(shape: sangkar.bentuk, color: Colors.cyanAccent),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : Container(
+                  height: 100,
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Riwayat & data $_activeDetailTab akan ditampilkan di sini.',
+                    style: const TextStyle(color: Colors.white38, fontSize: 11),
+                  ),
+                ),
+          const SizedBox(height: 20),
+
+          // Bottom Action to Create Order
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                Get.to(
+                  () => PesananFormPage(template: t),
+                  transition: Transition.fadeIn,
+                  duration: const Duration(milliseconds: 300),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.cyanAccent,
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              child: const Text('Gunakan Template', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ==========================================
+  // METRICS & LAYOUT ROW BUILDERS
   // ==========================================
 
   Widget _buildMiniStatCard(String title, String value, String desc, IconData icon, Color color) {
@@ -533,21 +876,21 @@ class _TemplatePageState extends State<TemplatePage> {
   }
 
   Widget _buildGridCard(TemplateSangkar t) {
-    final isSelected = _selectedTemplate?.id == t.id;
     final sangkar = DummyDb.jenisSangkar.firstWhere((s) => s.id == t.jenisSangkarId, orElse: () => DummyDb.jenisSangkar.first);
 
     return InkWell(
       onTap: () {
         setState(() {
-          _selectedTemplate = t;
+          _viewingDetailTemplate = t; // Switch to the dedicated Detail view!
+          _activeDetailTab = 'Komponen'; // Reset active tab
         });
       },
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.cyan.withValues(alpha: 0.08) : const Color(0xFF101B2D),
+          color: const Color(0xFF101B2D),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isSelected ? Colors.cyanAccent : Colors.white10),
+          border: Border.all(color: Colors.white10),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -564,7 +907,7 @@ class _TemplatePageState extends State<TemplatePage> {
                 child: CustomPaint(
                   painter: BirdcageFramePainter(
                     shape: sangkar.bentuk,
-                    color: isSelected ? Colors.cyanAccent : Colors.white30,
+                    color: Colors.white30,
                   ),
                 ),
               ),
@@ -596,19 +939,19 @@ class _TemplatePageState extends State<TemplatePage> {
   }
 
   Widget _buildListRow(TemplateSangkar t) {
-    final isSelected = _selectedTemplate?.id == t.id;
     final sangkar = DummyDb.jenisSangkar.firstWhere((s) => s.id == t.jenisSangkarId, orElse: () => DummyDb.jenisSangkar.first);
 
     return InkWell(
       onTap: () {
         setState(() {
-          _selectedTemplate = t;
+          _viewingDetailTemplate = t; // Switch to the dedicated Detail view!
+          _activeDetailTab = 'Komponen'; // Reset active tab
         });
       },
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.cyan.withValues(alpha: 0.08) : Colors.transparent,
+          color: Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -677,163 +1020,23 @@ class _TemplatePageState extends State<TemplatePage> {
     );
   }
 
-  Widget _buildDetailPanel(TemplateSangkar t) {
-    final isAktif = t.status == 'Aktif';
-    final sangkar = DummyDb.jenisSangkar.firstWhere((s) => s.id == t.jenisSangkarId, orElse: () => DummyDb.jenisSangkar.first);
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: _glassDecoration(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Detail Header
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(t.nama, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1, overflow: TextOverflow.ellipsis),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: isAktif ? Colors.green.withValues(alpha: 0.15) : Colors.orange.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(color: isAktif ? Colors.greenAccent : Colors.orangeAccent, width: 0.5),
-                ),
-                child: Text(
-                  t.status.toUpperCase(),
-                  style: TextStyle(fontSize: 8, color: isAktif ? Colors.greenAccent : Colors.orangeAccent, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              _buildCategoryPill(t.kategori),
-              const SizedBox(width: 6),
-              const Text('Tampilan Blueprint', style: TextStyle(fontSize: 9, color: Colors.white30)),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          // Detail Actions Row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildDetailActionButton(Icons.copy, 'Duplicate', () {}),
-              _buildDetailActionButton(Icons.ios_share_outlined, 'Export', () {}),
-              _buildDetailActionButton(Icons.delete_outline, 'Hapus', () {}, isRed: true),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          // Large Blueprint Canvas Frame Preview
-          Container(
-            height: 160,
-            width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF060D1A),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.cyan.withValues(alpha: 0.3)),
-            ),
-            child: Stack(
-              children: [
-                CustomPaint(
-                  size: const Size(double.infinity, double.infinity),
-                  painter: BirdcageFramePainter(shape: sangkar.bentuk, color: Colors.cyanAccent),
-                ),
-                // Dimension texts
-                Positioned(
-                  left: 10,
-                  top: 70,
-                  child: Text(t.dimensi.split('x').last.trim(), style: const TextStyle(fontSize: 8, color: Colors.white38)),
-                ),
-                Positioned(
-                  left: 80,
-                  bottom: 5,
-                  child: Text(t.dimensi.split('x').first.trim(), style: const TextStyle(fontSize: 8, color: Colors.white38)),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Detail Information List
-          const Text('Informasi', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white70)),
-          const SizedBox(height: 8),
-          _buildInfoRow('Kategori', t.kategori),
-          _buildInfoRow('Jenis Bentuk', sangkar.bentuk),
-          _buildInfoRow('Ukuran', t.dimensi),
-          _buildInfoRow('Layer', '${t.layers} Layer'),
-          _buildInfoRow('Versi', t.versi),
-          _buildInfoRow('Dibuat', t.tanggalDibuat),
-          _buildInfoRow('Dibuat oleh', t.dibuatOleh),
-          const SizedBox(height: 16),
-
-          // Component List
-          const Text('Komponen Template', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white70)),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF101B2D),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              children: [
-                _buildComponentRow('Frame Utama', 1),
-                _buildComponentRow('Ornamen Stiker', t.layers ~/ 2),
-                _buildComponentRow('Area Detail Teks', 2),
-                _buildComponentRow('Latar Belakang', 1),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Bottom Action: Gunakan Template
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                Get.to(
-                  () => PesananFormPage(template: t),
-                  transition: Transition.fadeIn,
-                  duration: const Duration(milliseconds: 300),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.cyanAccent,
-                foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              ),
-              child: const Text('Gunakan Template', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildDetailActionButton(IconData icon, String label, VoidCallback onTap, {bool isRed = false}) {
     final color = isRed ? Colors.redAccent : Colors.white70;
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         decoration: BoxDecoration(
           color: const Color(0xFF101B2D),
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(color: isRed ? Colors.redAccent.withValues(alpha: 0.2) : Colors.white10),
         ),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 12, color: color),
-            const SizedBox(width: 4),
-            Text(label, style: TextStyle(fontSize: 9, color: color, fontWeight: FontWeight.bold)),
+            Icon(icon, size: 13, color: color),
+            const SizedBox(width: 6),
+            Text(label, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.bold)),
           ],
         ),
       ),
@@ -842,12 +1045,12 @@ class _TemplatePageState extends State<TemplatePage> {
 
   Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 3),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontSize: 10, color: Colors.white38)),
-          Text(value, style: const TextStyle(fontSize: 10, color: Colors.white70)),
+          Text(label, style: const TextStyle(fontSize: 11, color: Colors.white38)),
+          Text(value, style: const TextStyle(fontSize: 11, color: Colors.white70)),
         ],
       ),
     );
@@ -855,18 +1058,18 @@ class _TemplatePageState extends State<TemplatePage> {
 
   Widget _buildComponentRow(String compName, int count) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 3),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
-              const Icon(Icons.layers_outlined, size: 10, color: Colors.cyanAccent),
-              const SizedBox(width: 6),
-              Text(compName, style: const TextStyle(fontSize: 10, color: Colors.white70)),
+              const Icon(Icons.layers_outlined, size: 12, color: Colors.cyanAccent),
+              const SizedBox(width: 8),
+              Text(compName, style: const TextStyle(fontSize: 11, color: Colors.white70)),
             ],
           ),
-          Text('$count', style: const TextStyle(fontSize: 10, color: Colors.white70, fontWeight: FontWeight.bold)),
+          Text('$count', style: const TextStyle(fontSize: 11, color: Colors.white70, fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -947,11 +1150,10 @@ class _TemplatePageState extends State<TemplatePage> {
           ),
           ElevatedButton(
             onPressed: () {
-              Get.to(
-                () => PesananFormPage(template: t),
-                transition: Transition.fadeIn,
-                duration: const Duration(milliseconds: 300),
-              );
+              setState(() {
+                _viewingDetailTemplate = t; // Switch to the dedicated Detail view!
+                _activeDetailTab = 'Komponen'; // Reset active tab
+              });
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.cyanAccent,
