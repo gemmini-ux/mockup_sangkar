@@ -82,6 +82,7 @@ class DesainDecal {
   final String desainer;
   final String tanggalBuat;
   final String status;       // Aktif, Arsip, Draft
+  final String? imageUrl;    // Opsional untuk URL Gambar AI / File
 
   const DesainDecal({
     required this.id,
@@ -94,6 +95,7 @@ class DesainDecal {
     required this.desainer,
     required this.tanggalBuat,
     required this.status,
+    this.imageUrl,
   });
 }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'features/desain/desain_page.dart';
 
 // ============================================================
 // HOMEPAGE MOCKUP 02 — Neon Purple
@@ -59,9 +60,10 @@ class _HomePageMc02State extends State<HomePageMc02> {
                   child: ListView(
                     children: [
                       _buildMenuItem(Icons.dashboard_outlined, 'Dashboard', 0),
-                      _buildMenuItem(Icons.precision_manufacturing_outlined, 'Produksi', 1),
-                      _buildMenuItem(Icons.shopping_cart_outlined, 'Pesanan', 2),
-                      _buildMenuItem(Icons.inventory_2_outlined, 'Stok', 3),
+                      _buildMenuItem(Icons.draw_outlined, 'Desain', 1),
+                      _buildMenuItem(Icons.precision_manufacturing_outlined, 'Produksi', 2),
+                      _buildMenuItem(Icons.shopping_cart_outlined, 'Pesanan', 3),
+                      _buildMenuItem(Icons.inventory_2_outlined, 'Stok', 4),
                     ],
                   ),
                 ),
@@ -78,46 +80,51 @@ class _HomePageMc02State extends State<HomePageMc02> {
           ),
           // Body
           Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.auto_awesome_rounded,
-                    size: 72,
-                    color: Colors.purpleAccent.withValues(alpha: 0.8),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Neon Purple',
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: _aktifIndex == 1
+                  ? const DesainPage()
+                  : Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.auto_awesome_rounded,
+                            size: 72,
+                            color: Colors.purpleAccent.withValues(alpha: 0.8),
+                          ),
+                          const SizedBox(height: 20),
+                          const Text(
+                            'Neon Purple',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Collapsible Sidebar · Glow Pulse Animation',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 12,
+                              color: Colors.white54,
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+                          const Text(
+                            '🚧  Sedang dikembangkan (Draf)',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 12,
+                              color: Colors.purpleAccent,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Collapsible Sidebar · Glow Pulse Animation',
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 12,
-                      color: Colors.white54,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  const Text(
-                    '🚧  Sedang dikembangkan (Draf)',
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 12,
-                      color: Colors.purpleAccent,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
             ),
           ),
         ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'features/desain/desain_page.dart';
 
 // ============================================================
 // HOMEPAGE MOCKUP 04 — Retro Amber
@@ -46,46 +47,51 @@ class _HomePageMc04State extends State<HomePageMc04> {
                   ),
                 ),
                 Expanded(
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.radar_rounded,
-                          size: 72,
-                          color: Colors.amber.withValues(alpha: 0.8),
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'Retro Amber',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: _aktifIndex == 1
+                        ? const DesainPage()
+                        : Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.radar_rounded,
+                                  size: 72,
+                                  color: Colors.amber.withValues(alpha: 0.8),
+                                ),
+                                const SizedBox(height: 20),
+                                const Text(
+                                  'Retro Amber',
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                const Text(
+                                  'Right Sidebar · Vintage Grid Layout · Fade + Sepia',
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    fontSize: 12,
+                                    color: Colors.white54,
+                                  ),
+                                ),
+                                const SizedBox(height: 32),
+                                const Text(
+                                  '🚧  Sedang dikembangkan (Draf)',
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    fontSize: 12,
+                                    color: Colors.amber,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'Right Sidebar · Vintage Grid Layout · Fade + Sepia',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 12,
-                            color: Colors.white54,
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-                        const Text(
-                          '🚧  Sedang dikembangkan (Draf)',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 12,
-                            color: Colors.amber,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                 ),
               ],
@@ -110,9 +116,10 @@ class _HomePageMc04State extends State<HomePageMc04> {
                 ),
                 const SizedBox(height: 16),
                 _buildSidebarItem(Icons.dashboard_outlined, 'Dashboard', 0),
-                _buildSidebarItem(Icons.precision_manufacturing_outlined, 'Produksi', 1),
-                _buildSidebarItem(Icons.shopping_cart_outlined, 'Pesanan', 2),
-                _buildSidebarItem(Icons.inventory_2_outlined, 'Stok', 3),
+                _buildSidebarItem(Icons.draw_outlined, 'Desain', 1),
+                _buildSidebarItem(Icons.precision_manufacturing_outlined, 'Produksi', 2),
+                _buildSidebarItem(Icons.shopping_cart_outlined, 'Pesanan', 3),
+                _buildSidebarItem(Icons.inventory_2_outlined, 'Stok', 4),
               ],
             ),
           ),

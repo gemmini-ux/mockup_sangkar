@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'features/desain/desain_page.dart';
 
 // ============================================================
 // HOMEPAGE MOCKUP 03 — Clean Minimalist
@@ -47,54 +48,60 @@ class _HomePageMc03State extends State<HomePageMc03> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _buildTabItem('Dashboard', 0),
-                _buildTabItem('Produksi', 1),
-                _buildTabItem('Pesanan', 2),
-                _buildTabItem('Stok', 3),
+                _buildTabItem('Desain', 1),
+                _buildTabItem('Produksi', 2),
+                _buildTabItem('Pesanan', 3),
+                _buildTabItem('Stok', 4),
               ],
             ),
           ),
         ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.blur_on_rounded,
-              size: 72,
-              color: Colors.teal,
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Clean Minimalist',
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: _aktifIndex == 1
+            ? const DesainPage()
+            : Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.blur_on_rounded,
+                      size: 72,
+                      color: Colors.teal,
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Clean Minimalist',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Top Navigation Bar · Slide-in Animation',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 12,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    const Text(
+                      '🚧  Sedang dikembangkan (Draf)',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 12,
+                        color: Colors.teal,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Top Navigation Bar · Slide-in Animation',
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 12,
-                color: Colors.black54,
-              ),
-            ),
-            const SizedBox(height: 32),
-            const Text(
-              '🚧  Sedang dikembangkan (Draf)',
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 12,
-                color: Colors.teal,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

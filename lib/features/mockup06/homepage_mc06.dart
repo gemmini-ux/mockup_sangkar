@@ -1,5 +1,6 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'features/desain/desain_page.dart';
 
 // ============================================================
 // HOMEPAGE MOCKUP 06 - Forest Green
@@ -45,31 +46,36 @@ class _HomePageMc06State extends State<HomePageMc06> {
             ),
             destinations: const [
               NavigationRailDestination(icon: Icon(Icons.dashboard_outlined), label: Text('Board')),
+              NavigationRailDestination(icon: Icon(Icons.draw_outlined), label: Text('Desain')),
               NavigationRailDestination(icon: Icon(Icons.precision_manufacturing_outlined), label: Text('Produksi')),
               NavigationRailDestination(icon: Icon(Icons.shopping_cart_outlined), label: Text('Pesanan')),
               NavigationRailDestination(icon: Icon(Icons.people_outline), label: Text('CRM')),
-              NavigationRailDestination(icon: Icon(Icons.bar_chart_outlined), label: Text('Laporan')),
             ],
           ),
           const VerticalDivider(color: Color(0xFF1A3A1A), width: 1),
           Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.forest_rounded, size: 72, color: Colors.greenAccent.withAlpha(200)),
-                  const SizedBox(height: 20),
-                  const Text('Forest Green',
-                    style: TextStyle(fontFamily: 'Poppins', fontSize: 24,
-                      fontWeight: FontWeight.bold, color: Colors.white)),
-                  const SizedBox(height: 8),
-                  const Text('Navigation Rail  |  Organic Grow Animation',
-                    style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.white54)),
-                  const SizedBox(height: 32),
-                  const Text('Sedang dikembangkan...',
-                    style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.greenAccent)),
-                ],
-              ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: _railAktif == 1
+                  ? const DesainPage()
+                  : Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.forest_rounded, size: 72, color: Colors.greenAccent.withAlpha(200)),
+                          const SizedBox(height: 20),
+                          const Text('Forest Green',
+                            style: TextStyle(fontFamily: 'Poppins', fontSize: 24,
+                              fontWeight: FontWeight.bold, color: Colors.white)),
+                          const SizedBox(height: 8),
+                          const Text('Navigation Rail  |  Organic Grow Animation',
+                            style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.white54)),
+                          const SizedBox(height: 32),
+                          const Text('Sedang dikembangkan...',
+                            style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.greenAccent)),
+                        ],
+                      ),
+                    ),
             ),
           ),
         ],

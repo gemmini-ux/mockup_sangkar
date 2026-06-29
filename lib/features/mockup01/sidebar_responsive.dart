@@ -2,6 +2,8 @@
 // SIDEBAR RESPONSIVE — Versi Desktop (280px) & Tablet (72px ikon)
 // ============================================================
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:mocupsangkar/homepage.dart';
 
 class SidebarDesktop extends StatelessWidget {
   final int menuAktif;
@@ -143,7 +145,16 @@ class SidebarDesktop extends StatelessWidget {
                     ],
                   ),
                 ),
-                Icon(Icons.logout_outlined, color: Colors.white30, size: 18),
+                IconButton(
+                  icon: const Icon(Icons.logout_outlined, color: Colors.white30, size: 18),
+                  hoverColor: Colors.redAccent.withValues(alpha: 0.1),
+                  highlightColor: Colors.transparent,
+                  splashColor: Colors.transparent,
+                  onPressed: () => _logout(context),
+                  tooltip: 'Keluar',
+                  constraints: const BoxConstraints(),
+                  padding: EdgeInsets.zero,
+                ),
               ],
             ),
           ),
@@ -236,6 +247,19 @@ class SidebarTablet extends StatelessWidget {
               gradient: LinearGradient(colors: [Colors.cyanAccent, Colors.blue]),
             ),
             child: const Icon(Icons.person, color: Colors.black, size: 20),
+          ),
+          const SizedBox(height: 12),
+          Tooltip(
+            message: 'Keluar',
+            preferBelow: false,
+            child: InkWell(
+              onTap: () => _logout(context),
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                child: const Icon(Icons.logout_outlined, color: Colors.white30, size: 18),
+              ),
+            ),
           ),
           const SizedBox(height: 16),
         ],
@@ -359,6 +383,13 @@ class DrawerMobile extends StatelessWidget {
                       ],
                     ),
                   ),
+                  IconButton(
+                    icon: const Icon(Icons.logout_outlined, color: Colors.white30, size: 18),
+                    onPressed: () => _logout(context),
+                    tooltip: 'Keluar',
+                    constraints: const BoxConstraints(),
+                    padding: EdgeInsets.zero,
+                  ),
                 ],
               ),
             ),
@@ -442,4 +473,52 @@ List<(IconData, String)> _menus() => [
   (Icons.bar_chart_outlined,             'Laporan'),
   (Icons.settings_outlined,              'Pengaturan'),
 ];
+
+void _logout(BuildContext context) {
+  Get.dialog(
+    AlertDialog(
+      backgroundColor: const Color(0xFF0C0A19),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: Colors.cyanAccent, width: 0.5),
+      ),
+      title: const Row(
+        children: [
+          Icon(Icons.logout_rounded, color: Colors.cyanAccent, size: 20),
+          SizedBox(width: 8),
+          Text(
+            'KELUAR APLIKASI?',
+            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+      content: const Text(
+        'Apakah Anda yakin ingin keluar dan kembali ke halaman utama pemilihan mockup?',
+        style: TextStyle(color: Colors.white70, fontSize: 11, height: 1.5),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Get.back(),
+          child: const Text('Batal', style: TextStyle(color: Colors.white38, fontSize: 11)),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Get.back(); // close dialog
+            Get.offAll(
+              () => const HomePage(),
+              transition: Transition.fade,
+              duration: const Duration(milliseconds: 300),
+            );
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.cyanAccent,
+            foregroundColor: Colors.black,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          ),
+          child: const Text('Keluar', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+        ),
+      ],
+    ),
+  );
+}
 

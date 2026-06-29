@@ -1,5 +1,6 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'features/desain/desain_page.dart';
 
 // MOCKUP 10 - Monochrome Glass | Glass Overlay Navigation | Frosted Reveal
 class HomePageMc10 extends StatefulWidget {
@@ -10,6 +11,7 @@ class HomePageMc10 extends StatefulWidget {
 
 class _HomePageMc10State extends State<HomePageMc10> {
   bool _navBuka = false;
+  String _aktifMenu = 'Dashboard';
 
   @override
   Widget build(BuildContext context) {
@@ -18,23 +20,28 @@ class _HomePageMc10State extends State<HomePageMc10> {
       body: Stack(
         children: [
           // ── Konten Utama ─────────────────────────────────
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.blur_on_rounded, size: 72, color: Colors.white54),
-                const SizedBox(height: 20),
-                const Text('Monochrome Glass',
-                  style: TextStyle(fontFamily: 'Poppins', fontSize: 24,
-                    fontWeight: FontWeight.bold, color: Colors.white)),
-                const SizedBox(height: 8),
-                const Text('Glass Overlay Nav  |  Full Backdrop Blur  |  Frosted Reveal',
-                  style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.white54)),
-                const SizedBox(height: 32),
-                const Text('Sedang dikembangkan...',
-                  style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.white38)),
-              ],
-            ),
+          Padding(
+            padding: const EdgeInsets.only(top: 80, left: 20, right: 20, bottom: 20),
+            child: _aktifMenu == 'Desain'
+                ? const DesainPage()
+                : Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.blur_on_rounded, size: 72, color: Colors.white54),
+                        const SizedBox(height: 20),
+                        const Text('Monochrome Glass',
+                          style: TextStyle(fontFamily: 'Poppins', fontSize: 24,
+                            fontWeight: FontWeight.bold, color: Colors.white)),
+                        const SizedBox(height: 8),
+                        const Text('Glass Overlay Nav  |  Full Backdrop Blur  |  Frosted Reveal',
+                          style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.white54)),
+                        const SizedBox(height: 32),
+                        const Text('Sedang dikembangkan...',
+                          style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.white38)),
+                      ],
+                    ),
+                  ),
           ),
 
           // ── Tombol Buka Nav ──────────────────────────────
@@ -55,8 +62,8 @@ class _HomePageMc10State extends State<HomePageMc10> {
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: Colors.white.withAlpha(30)),
                     ),
-                    child: const Text('☰  Menu',
-                      style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.white70)),
+                    child: Text('☰  Menu (${_aktifMenu == 'Desain' ? 'Desain' : 'Dashboard'})',
+                      style: const TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.white70)),
                   ),
                 ),
               ],
@@ -77,7 +84,7 @@ class _HomePageMc10State extends State<HomePageMc10> {
               width: 260,
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withAlpha(12),
+                  color: const Color(0xFF1E1E1E),
                   border: Border(right: BorderSide(color: Colors.white.withAlpha(20))),
                 ),
                 child: SafeArea(
@@ -88,11 +95,14 @@ class _HomePageMc10State extends State<HomePageMc10> {
                         style: TextStyle(fontFamily: 'Poppins', fontSize: 13,
                           fontWeight: FontWeight.bold, color: Colors.white70, letterSpacing: 2)),
                       const Divider(color: Colors.white12),
-                      ...['Dashboard', 'Produksi', 'Pesanan', 'Stok', 'Pelanggan', 'Laporan', 'Pengaturan']
+                      ...['Dashboard', 'Desain', 'Produksi', 'Pesanan', 'Stok']
                         .map((m) => ListTile(
-                          title: Text(m, style: const TextStyle(
-                            fontFamily: 'Poppins', fontSize: 12, color: Colors.white60)),
-                          onTap: () => setState(() => _navBuka = false))),
+                          title: Text(m, style: TextStyle(
+                            fontFamily: 'Poppins', fontSize: 12, color: m == _aktifMenu ? Colors.white : Colors.white60, fontWeight: m == _aktifMenu ? FontWeight.bold : FontWeight.normal)),
+                          onTap: () => setState(() {
+                            _aktifMenu = m;
+                            _navBuka = false;
+                          }))),
                     ],
                   ),
                 ),

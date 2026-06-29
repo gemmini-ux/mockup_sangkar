@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'features/desain/desain_page.dart';
 
 // ============================================================
 // HOMEPAGE MOCKUP 05 — Oceanic Teal
@@ -59,23 +60,28 @@ class _HomePageMc05State extends State<HomePageMc05> {
           ),
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.waves_rounded, size: 72, color: Colors.tealAccent.withValues(alpha: .8)),
-            const SizedBox(height: 20),
-            const Text('Oceanic Teal',
-              style: TextStyle(fontFamily: 'Poppins', fontSize: 24,
-                fontWeight: FontWeight.bold, color: Colors.white)),
-            const SizedBox(height: 8),
-            const Text('Bottom Tab Navigation · Wave Ripple Animation',
-              style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.white54)),
-            const SizedBox(height: 32),
-            const Text('🚧  Sedang dikembangkan',
-              style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.tealAccent)),
-          ],
-        ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: _tabAktif == 1
+            ? const DesainPage()
+            : Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.waves_rounded, size: 72, color: Colors.tealAccent.withValues(alpha: .8)),
+                    const SizedBox(height: 20),
+                    const Text('Oceanic Teal',
+                      style: TextStyle(fontFamily: 'Poppins', fontSize: 24,
+                        fontWeight: FontWeight.bold, color: Colors.white)),
+                    const SizedBox(height: 8),
+                    const Text('Bottom Tab Navigation · Wave Ripple Animation',
+                      style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.white54)),
+                    const SizedBox(height: 32),
+                    const Text('🚧  Sedang dikembangkan',
+                      style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.tealAccent)),
+                  ],
+                ),
+              ),
       ),
       bottomNavigationBar: _BottomNavTeal(aktif: _tabAktif, onTap: (i) => setState(() => _tabAktif = i)),
     );
@@ -91,10 +97,10 @@ class _BottomNavTeal extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = [
       (Icons.dashboard_outlined,              'Dashboard'),
+      (Icons.draw_outlined,                   'Desain'),
       (Icons.precision_manufacturing_outlined,'Produksi'),
       (Icons.shopping_cart_outlined,          'Pesanan'),
       (Icons.inventory_2_outlined,            'Stok'),
-      (Icons.settings_outlined,               'Setelan'),
     ];
     return Container(
       height: 68,

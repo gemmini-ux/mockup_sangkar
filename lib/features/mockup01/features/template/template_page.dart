@@ -21,7 +21,8 @@ class _TemplatePageState extends State<TemplatePage> {
   TemplateSangkar? _viewingDetailTemplate;
 
   // Active tab in the detail page
-  String _activeDetailTab = 'Komponen';
+  String _activeDetailTab = 'Bagian Sangkar';
+  bool _showDecalPattern = true;
 
   @override
   Widget build(BuildContext context) {
@@ -610,9 +611,9 @@ class _TemplatePageState extends State<TemplatePage> {
           ),
           const SizedBox(height: 24),
 
-          // 3. Bottom Tab Menu: Komponen, Preview, Riwayat Versi, Penggunaan
+          // 3. Bottom Tab Menu: Bagian Sangkar, Komponen, Preview, Riwayat Versi, Penggunaan
           Row(
-            children: ['Komponen', 'Preview', 'Riwayat Versi', 'Penggunaan'].map((tab) {
+            children: ['Bagian Sangkar', 'Komponen', 'Preview', 'Riwayat Versi', 'Penggunaan'].map((tab) {
               final isTabSelected = _activeDetailTab == tab;
               return InkWell(
                 onTap: () => setState(() => _activeDetailTab = tab),
@@ -643,10 +644,12 @@ class _TemplatePageState extends State<TemplatePage> {
           const SizedBox(height: 16),
 
           // 4. Tab Contents
-          _activeDetailTab == 'Komponen'
-              ? Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+          _activeDetailTab == 'Bagian Sangkar'
+              ? _buildBagianSangkarTab(t, sangkar)
+              : _activeDetailTab == 'Komponen'
+                  ? Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                     // Left Column: Komponen Template List
                     Expanded(
                       child: Container(
@@ -915,7 +918,7 @@ class _TemplatePageState extends State<TemplatePage> {
       onTap: () {
         setState(() {
           _viewingDetailTemplate = t; // Switch to the dedicated Detail view!
-          _activeDetailTab = 'Komponen'; // Reset active tab
+          _activeDetailTab = 'Bagian Sangkar'; // Reset active tab
         });
       },
       child: Container(
@@ -955,6 +958,8 @@ class _TemplatePageState extends State<TemplatePage> {
             ),
             const SizedBox(height: 4),
             Text(t.nama, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white), maxLines: 1, overflow: TextOverflow.ellipsis),
+            const SizedBox(height: 1),
+            Text('Sangkar: ${sangkar.nama}', style: const TextStyle(fontSize: 9, color: Colors.cyanAccent), maxLines: 1, overflow: TextOverflow.ellipsis),
             const SizedBox(height: 2),
             Text('${t.dimensi} • ${t.layers} Layer', style: const TextStyle(fontSize: 9, color: Colors.white54)),
             const SizedBox(height: 2),
@@ -978,7 +983,7 @@ class _TemplatePageState extends State<TemplatePage> {
       onTap: () {
         setState(() {
           _viewingDetailTemplate = t; // Switch to the dedicated Detail view!
-          _activeDetailTab = 'Komponen'; // Reset active tab
+          _activeDetailTab = 'Bagian Sangkar'; // Reset active tab
         });
       },
       child: Container(
@@ -1007,7 +1012,7 @@ class _TemplatePageState extends State<TemplatePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(t.nama, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white)),
-                  Text('${t.dimensi} · ${t.layers} Layer', style: const TextStyle(fontSize: 9, color: Colors.white54)),
+                  Text('Sangkar: ${sangkar.nama} · ${t.dimensi}', style: const TextStyle(fontSize: 9, color: Colors.white54)),
                 ],
               ),
             ),
@@ -1185,7 +1190,7 @@ class _TemplatePageState extends State<TemplatePage> {
             onPressed: () {
               setState(() {
                 _viewingDetailTemplate = t; // Switch to the dedicated Detail view!
-                _activeDetailTab = 'Komponen'; // Reset active tab
+                _activeDetailTab = 'Bagian Sangkar'; // Reset active tab
               });
             },
             style: ElevatedButton.styleFrom(
@@ -1253,6 +1258,515 @@ class _TemplatePageState extends State<TemplatePage> {
       color: const Color(0xFF091121),
       borderRadius: BorderRadius.circular(12),
       border: Border.all(color: Colors.cyan.withValues(alpha: 0.15)),
+    );
+  }
+
+  // ==========================================
+  // BAGIAN SANGKAR TAB COMPONENT
+  // ==========================================
+  Widget _buildBagianSangkarTab(TemplateSangkar t, JenisSangkar sangkar) {
+    final listBagian = [
+      'Kaki Kaki',
+      'Cantolan',
+      'Pelengkung',
+      'Cagak',
+      'Raen',
+      'Alas Bawah',
+      'Pintu',
+      'Tutup Atas',
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Tab Header containing the switch toggle
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Detail Komponen Fisik',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white70),
+            ),
+            // Dynamic Toggle: Desain Decal / Pola Polos
+            Container(
+              height: 28,
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: const Color(0xFF101B2D),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: Colors.white10),
+              ),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => setState(() => _showDecalPattern = true),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: _showDecalPattern ? Colors.cyanAccent : Colors.transparent,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Desain Decal',
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                          color: _showDecalPattern ? Colors.black : Colors.white70,
+                        ),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => setState(() => _showDecalPattern = false),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: !_showDecalPattern ? Colors.cyanAccent : Colors.transparent,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Pola Polos',
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                          color: !_showDecalPattern ? Colors.black : Colors.white70,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final double w = constraints.maxWidth;
+            int cols = 3;
+            double aspect = 0.85;
+            if (w < 480) {
+              cols = 1;
+              aspect = 1.6;
+            } else if (w < 750) {
+              cols = 2;
+              aspect = 0.95;
+            }
+
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: listBagian.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: cols,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: aspect,
+              ),
+              itemBuilder: (context, idx) {
+                final partName = listBagian[idx];
+                final sizeStr = _getPartSize(partName, sangkar.id);
+
+                return Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF101B2D),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.cyan.withValues(alpha: 0.15)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Image Preview
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => _tampilkanPreviewGambarBagian(context, partName, sizeStr),
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              topRight: Radius.circular(12),
+                            ),
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                _buildPartImageWidget(partName),
+                                Positioned(
+                                  top: 8,
+                                  right: 8,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: const BoxDecoration(
+                                      color: Colors.black54,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.fullscreen_rounded,
+                                      color: Colors.white,
+                                      size: 14,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Details (Name & Size)
+                      Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              partName,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.straighten_rounded,
+                                  size: 10,
+                                  color: Colors.cyanAccent,
+                                ),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    sizeStr,
+                                    style: const TextStyle(
+                                      fontSize: 9,
+                                      color: Colors.white70,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  void _tampilkanPreviewGambarBagian(
+      BuildContext context, String name, String sizeStr) {
+    Get.dialog(
+      Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 500, maxHeight: 550),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0C0A19),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.cyanAccent, width: 0.5),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(name, style: const TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 2),
+                    Text('Ukuran: $sizeStr', style: const TextStyle(fontSize: 10, color: Colors.cyanAccent)),
+                  ],
+                ),
+                leading: IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white60),
+                  onPressed: () => Get.back(),
+                ),
+                actions: [
+                  TextButton.icon(
+                    onPressed: () {
+                      Get.dialog(
+                        Dialog(
+                          backgroundColor: Colors.transparent,
+                          child: Container(
+                            constraints: const BoxConstraints(maxWidth: 800, maxHeight: 800),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF0C0A19),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: Colors.cyanAccent, width: 0.5),
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                AppBar(
+                                  backgroundColor: Colors.transparent,
+                                  elevation: 0,
+                                  title: const Text('Lembar Layout Decal Lengkap', style: TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.bold)),
+                                  leading: IconButton(
+                                    icon: const Icon(Icons.close, color: Colors.white60),
+                                    onPressed: () => Get.back(),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: InteractiveViewer(
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.asset('assets/images/decal_layout.jpg', fit: BoxFit.contain),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.grid_view_rounded, size: 12, color: Colors.cyanAccent),
+                    label: const Text('Lembar Lengkap', style: TextStyle(fontSize: 10, color: Colors.cyanAccent)),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: InteractiveViewer(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: _buildPartImageWidget(name),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _getPartSize(String partName, String sangkarId) {
+    if (sangkarId == 'SK-001') {
+      switch (partName) {
+        case 'Kaki Kaki':
+          return '4 sisi × 6 × 6 cm';
+        case 'Cantolan':
+          return 'T 18 cm × Ø 10 cm';
+        case 'Pelengkung':
+          return 'Keliling 141 cm × T 20 cm';
+        case 'Cagak':
+          return '4 tiang × T 60 cm';
+        case 'Raen':
+          return 'Depan 15 × 10 cm';
+        case 'Alas Bawah':
+          return 'Ø 45 cm × Tebal 2.5 cm';
+        case 'Pintu':
+          return '8 × 12 cm';
+        case 'Tutup Atas':
+          return 'Ø 12 cm';
+        default:
+          return 'Standar';
+      }
+    } else if (sangkarId == 'SK-002') {
+      switch (partName) {
+        case 'Kaki Kaki':
+          return '4 sisi × 4 × 4 cm';
+        case 'Cantolan':
+          return 'T 15 cm × Ø 8 cm';
+        case 'Pelengkung':
+          return 'Keliling 100 cm × T 12 cm';
+        case 'Cagak':
+          return '4 tiang × T 45 cm';
+        case 'Raen':
+          return 'Depan 12 × 8 cm';
+        case 'Alas Bawah':
+          return '35 × 28 cm × Tebal 2 cm';
+        case 'Pintu':
+          return '7 × 10 cm';
+        case 'Tutup Atas':
+          return 'Ø 10 cm';
+        default:
+          return 'Standar';
+      }
+    } else if (sangkarId == 'SK-003') {
+      switch (partName) {
+        case 'Kaki Kaki':
+          return '6 tiang × 3 × 3 cm';
+        case 'Cantolan':
+          return 'T 16 cm × Ø 9 cm';
+        case 'Pelengkung':
+          return 'Kubah Hex × T 15 cm';
+        case 'Cagak':
+          return '6 tiang × T 55 cm';
+        case 'Raen':
+          return 'Sisi depan 20 × 25 cm';
+        case 'Alas Bawah':
+          return 'Sisi 20 cm × Tebal 2 cm';
+        case 'Pintu':
+          return '8 × 11 cm';
+        case 'Tutup Atas':
+          return '10 × 10 cm';
+        default:
+          return 'Standar';
+      }
+    } else {
+      switch (partName) {
+        case 'Kaki Kaki':
+          return '4 sudut × 5 × 5 cm';
+        case 'Cantolan':
+          return 'T 14 cm × Ø 8 cm';
+        case 'Pelengkung':
+          return 'Atap 30 × 25 cm';
+        case 'Cagak':
+          return '4 tiang × T 40 cm';
+        case 'Raen':
+          return 'Panel depan 30 × 35 cm';
+        case 'Alas Bawah':
+          return '30 × 25 cm × Tebal 1.8 cm';
+        case 'Pintu':
+          return '8 × 10 cm';
+        case 'Tutup Atas':
+          return '10 × 8 cm';
+        default:
+          return 'Standar';
+      }
+    }
+  }
+
+  Widget _buildPartImageWidget(String partName) {
+    if (partName == 'Kaki Kaki') {
+      if (!_showDecalPattern) {
+        // Show raw cropped wood foot color-filtered to plain solid grey on a white background
+        return Container(
+          color: Colors.white,
+          child: ClipRect(
+            child: FractionallySizedBox(
+              widthFactor: 1.25,
+              heightFactor: 4.1,
+              alignment: const Alignment(0.05, 0.95),
+              child: ColorFiltered(
+                colorFilter: const ColorFilter.mode(
+                  Color(0xFFA0A0A0),
+                  BlendMode.srcATop,
+                ),
+                child: Image.asset(
+                  'assets/images/kaki_kaki_raw.png',
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+          ),
+        );
+      } else {
+        // Show raw cropped wood foot in its original brown color
+        return Container(
+          color: const Color(0xFF0C0A19),
+          child: ClipRect(
+            child: FractionallySizedBox(
+              widthFactor: 1.25,
+              heightFactor: 4.1,
+              alignment: const Alignment(0.05, 0.95),
+              child: Image.asset(
+                'assets/images/kaki_kaki_raw.png',
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        );
+      }
+    }
+
+    Widget imageWidget;
+
+    if (partName == 'Cantolan') {
+      imageWidget = Image.asset(
+        !_showDecalPattern ? 'assets/images/cantolan_polos.png' : 'assets/images/cantolan.png',
+        fit: BoxFit.contain,
+      );
+    } else if (partName == 'Pelengkung') {
+      imageWidget = Image.asset(
+        'assets/images/pelengkung.png',
+        fit: BoxFit.contain,
+      );
+    } else if (partName == 'Alas Bawah') {
+      imageWidget = Image.asset(
+        !_showDecalPattern ? 'assets/images/alas_bawah_polos.png' : 'assets/images/alas_bawah.png',
+        fit: BoxFit.contain,
+      );
+    } else if (partName == 'Cagak') {
+      imageWidget = Image.asset(
+        'assets/images/cagak.png',
+        fit: BoxFit.contain,
+      );
+    } else if (partName == 'Raen') {
+      imageWidget = Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Image.asset(
+              'assets/images/raen_atas.png',
+              fit: BoxFit.contain,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Expanded(
+            child: Image.asset(
+              'assets/images/raen_bawah.png',
+              fit: BoxFit.contain,
+            ),
+          ),
+        ],
+      );
+    } else if (partName == 'Pintu') {
+      imageWidget = Image.asset(
+        'assets/images/pintu.png',
+        fit: BoxFit.contain,
+      );
+    } else if (partName == 'Tutup Atas') {
+      imageWidget = Image.asset(
+        'assets/images/tutup_atas.png',
+        fit: BoxFit.contain,
+      );
+    } else {
+      const assetPath = 'assets/images/decal_layout.jpg';
+      imageWidget = ClipRect(
+        child: FractionallySizedBox(
+          widthFactor: 1.0,
+          heightFactor: 1.0,
+          alignment: Alignment.center,
+          child: Image.asset(
+            assetPath,
+            fit: BoxFit.contain,
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      color: !_showDecalPattern ? Colors.white : const Color(0xFF0C0A19),
+      alignment: Alignment.center,
+      padding: partName == 'Raen' ? const EdgeInsets.symmetric(vertical: 4, horizontal: 8) : EdgeInsets.zero,
+      child: !_showDecalPattern && partName != 'Cantolan' && partName != 'Alas Bawah'
+          ? ColorFiltered(
+              colorFilter: const ColorFilter.mode(
+                Color(0xFFA0A0A0), // matching user's solid grey theme
+                BlendMode.srcIn,
+              ),
+              child: imageWidget,
+            )
+          : imageWidget,
     );
   }
 }
