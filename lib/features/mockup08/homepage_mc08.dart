@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'features/desain/desain_page.dart';
+import 'package:mocupsangkar/features/mockup01/features/dashboard/themed_dashboard.dart';
 import 'package:mocupsangkar/features/mockup01/features/data_sangkar/data_sangkar_page.dart';
 import 'package:mocupsangkar/features/mockup01/features/template/template_page.dart';
 import 'package:mocupsangkar/features/mockup01/controllers/sangkar_controller.dart';
@@ -54,20 +55,7 @@ class _HomePageMc08State extends State<HomePageMc08> {
                   )
                 : _aktifMenu == 'Desain'
                     ? const DesainPage()
-            : Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.local_florist_rounded, size: 72, color: Colors.pinkAccent.withAlpha(200)),
-                    const SizedBox(height: 20),
-                    const Text('Sakura Pink', style: TextStyle(fontFamily: 'Poppins', fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
-                    const SizedBox(height: 8),
-                    const Text('Floating FAB Menu  |  Masonry Layout  |  Bloom Fade', style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.white54)),
-                    const SizedBox(height: 32),
-                    const Text('Sedang dikembangkan...', style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.pinkAccent)),
-                  ],
-                ),
-              ),
+            : ThemedDashboard(accentColor: Colors.pinkAccent, cardColor: Color(0xFF2E0C1B), backgroundColor: Color(0xFF1A0A0F), isLightTheme: false),
       ),
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,

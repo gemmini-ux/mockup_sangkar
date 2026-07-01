@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'features/desain/desain_page.dart';
+import 'package:mocupsangkar/features/mockup01/features/dashboard/themed_dashboard.dart';
 import 'package:mocupsangkar/features/mockup01/features/data_sangkar/data_sangkar_page.dart';
 import 'package:mocupsangkar/features/mockup01/features/template/template_page.dart';
 import 'package:mocupsangkar/features/mockup01/controllers/sangkar_controller.dart';
@@ -86,47 +87,7 @@ class _HomePageMc03State extends State<HomePageMc03> {
                   )
                 : _aktifIndex == 3
                     ? const DesainPage()
-            : Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.blur_on_rounded,
-                      size: 72,
-                      color: Colors.teal,
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Clean Minimalist',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Top Navigation Bar · Slide-in Animation',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 12,
-                        color: Colors.black54,
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    const Text(
-                      '🚧  Sedang dikembangkan (Draf)',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 12,
-                        color: Colors.teal,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            : ThemedDashboard(accentColor: Colors.teal, cardColor: Colors.white, backgroundColor: Color(0xFFF8F9FA), isLightTheme: true),
       ),
     );
   }

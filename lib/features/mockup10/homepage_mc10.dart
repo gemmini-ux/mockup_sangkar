@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'features/desain/desain_page.dart';
+import 'package:mocupsangkar/features/mockup01/features/dashboard/themed_dashboard.dart';
 import 'package:mocupsangkar/features/mockup01/features/data_sangkar/data_sangkar_page.dart';
 import 'package:mocupsangkar/features/mockup01/features/template/template_page.dart';
 import 'package:mocupsangkar/features/mockup01/controllers/sangkar_controller.dart';
@@ -48,24 +49,7 @@ class _HomePageMc10State extends State<HomePageMc10> {
                       )
                     : _aktifMenu == 'Desain'
                         ? const DesainPage()
-                : Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.blur_on_rounded, size: 72, color: Colors.white54),
-                        const SizedBox(height: 20),
-                        const Text('Monochrome Glass',
-                          style: TextStyle(fontFamily: 'Poppins', fontSize: 24,
-                            fontWeight: FontWeight.bold, color: Colors.white)),
-                        const SizedBox(height: 8),
-                        const Text('Glass Overlay Nav  |  Full Backdrop Blur  |  Frosted Reveal',
-                          style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.white54)),
-                        const SizedBox(height: 32),
-                        const Text('Sedang dikembangkan...',
-                          style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.white38)),
-                      ],
-                    ),
-                  ),
+                : ThemedDashboard(accentColor: Colors.white, cardColor: Color(0xFF1E1E1E), backgroundColor: Color(0xFF101010), isLightTheme: false),
           ),
 
           // ── Tombol Buka Nav ──────────────────────────────

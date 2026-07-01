@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'features/desain/desain_page.dart';
+import 'package:mocupsangkar/features/mockup01/features/dashboard/themed_dashboard.dart';
 import 'package:mocupsangkar/features/mockup01/features/data_sangkar/data_sangkar_page.dart';
 import 'package:mocupsangkar/features/mockup01/features/template/template_page.dart';
 import 'package:mocupsangkar/features/mockup01/controllers/sangkar_controller.dart';
@@ -75,47 +76,7 @@ class _HomePageMc04State extends State<HomePageMc04> {
                               )
                             : _aktifIndex == 3
                                 ? const DesainPage()
-                        : Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.radar_rounded,
-                                  size: 72,
-                                  color: Colors.amber.withValues(alpha: 0.8),
-                                ),
-                                const SizedBox(height: 20),
-                                const Text(
-                                  'Retro Amber',
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                const Text(
-                                  'Right Sidebar · Vintage Grid Layout · Fade + Sepia',
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontSize: 12,
-                                    color: Colors.white54,
-                                  ),
-                                ),
-                                const SizedBox(height: 32),
-                                const Text(
-                                  '🚧  Sedang dikembangkan (Draf)',
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontSize: 12,
-                                    color: Colors.amber,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                        : ThemedDashboard(accentColor: Colors.amber, cardColor: Color(0xFF261800), backgroundColor: Color(0xFF1A1000), isLightTheme: false),
                   ),
                 ),
               ],

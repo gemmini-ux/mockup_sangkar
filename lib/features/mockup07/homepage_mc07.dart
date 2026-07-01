@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'features/desain/desain_page.dart';
+import 'package:mocupsangkar/features/mockup01/features/dashboard/themed_dashboard.dart';
 import 'package:mocupsangkar/features/mockup01/features/data_sangkar/data_sangkar_page.dart';
 import 'package:mocupsangkar/features/mockup01/features/template/template_page.dart';
 import 'package:mocupsangkar/features/mockup01/controllers/sangkar_controller.dart';
@@ -85,20 +86,7 @@ class _HomePageMc07State extends State<HomePageMc07> {
                         )
                       : _aktifIndex == 3
                           ? const DesainPage()
-                  : Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.local_fire_department_rounded, size: 72, color: Colors.redAccent.withAlpha(200)),
-                          const SizedBox(height: 20),
-                          const Text('Metallic Crimson', style: TextStyle(fontFamily: 'Poppins', fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
-                          const SizedBox(height: 8),
-                          const Text('Sidebar + Header  |  Shimmer Effect', style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.white54)),
-                          const SizedBox(height: 32),
-                          const Text('Sedang dikembangkan...', style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.redAccent)),
-                        ],
-                      ),
-                    ),
+                  : ThemedDashboard(accentColor: Colors.redAccent, cardColor: Color(0xFF2D0A0A), backgroundColor: Color(0xFF1A0A0A), isLightTheme: false),
             ),
           ),
         ],

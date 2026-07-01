@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'features/desain/desain_page.dart';
+import 'package:mocupsangkar/features/mockup01/features/dashboard/themed_dashboard.dart';
 import 'package:mocupsangkar/features/mockup01/features/data_sangkar/data_sangkar_page.dart';
 import 'package:mocupsangkar/features/mockup01/features/template/template_page.dart';
 import 'package:mocupsangkar/features/mockup01/controllers/sangkar_controller.dart';
@@ -88,24 +89,7 @@ class _HomePageMc05State extends State<HomePageMc05> {
                   )
                 : _tabAktif == 3
                     ? const DesainPage()
-            : Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.waves_rounded, size: 72, color: Colors.tealAccent.withValues(alpha: .8)),
-                    const SizedBox(height: 20),
-                    const Text('Oceanic Teal',
-                      style: TextStyle(fontFamily: 'Poppins', fontSize: 24,
-                        fontWeight: FontWeight.bold, color: Colors.white)),
-                    const SizedBox(height: 8),
-                    const Text('Bottom Tab Navigation · Wave Ripple Animation',
-                      style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.white54)),
-                    const SizedBox(height: 32),
-                    const Text('🚧  Sedang dikembangkan',
-                      style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.tealAccent)),
-                  ],
-                ),
-              ),
+            : ThemedDashboard(accentColor: Colors.tealAccent, cardColor: Color(0xFF003333), backgroundColor: Color(0xFF001A1A), isLightTheme: false),
       ),
       bottomNavigationBar: _BottomNavTeal(aktif: _tabAktif, onTap: (i) => setState(() => _tabAktif = i)),
     );
