@@ -76,7 +76,7 @@ class _HomePageMc04State extends State<HomePageMc04> {
                               )
                             : _aktifIndex == 3
                                 ? const DesainPage()
-                        : ThemedDashboard(accentColor: Colors.amber, cardColor: Color(0xFF261800), backgroundColor: Color(0xFF1A1000), isLightTheme: false),
+                        : ThemedDashboard(layoutType: 'retro_amber', accentColor: Colors.amber, cardColor: Color(0xFF261800), backgroundColor: Color(0xFF1A1000), isLightTheme: false),
                   ),
                 ),
               ],

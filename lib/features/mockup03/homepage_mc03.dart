@@ -87,7 +87,7 @@ class _HomePageMc03State extends State<HomePageMc03> {
                   )
                 : _aktifIndex == 3
                     ? const DesainPage()
-            : ThemedDashboard(accentColor: Colors.teal, cardColor: Colors.white, backgroundColor: Color(0xFFF8F9FA), isLightTheme: true),
+            : ThemedDashboard(layoutType: 'clean_minimalist', accentColor: Colors.teal, cardColor: Colors.white, backgroundColor: Color(0xFFF8F9FA), isLightTheme: true),
       ),
     );
   }

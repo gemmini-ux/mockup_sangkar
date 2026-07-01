@@ -82,7 +82,7 @@ class _HomePageMc06State extends State<HomePageMc06> {
                         )
                       : _railAktif == 3
                           ? const DesainPage()
-                  : ThemedDashboard(accentColor: Colors.greenAccent, cardColor: Color(0xFF142E14), backgroundColor: Color(0xFF0A1A0A), isLightTheme: false),
+                  : ThemedDashboard(layoutType: 'forest_green', accentColor: Colors.greenAccent, cardColor: Color(0xFF142E14), backgroundColor: Color(0xFF0A1A0A), isLightTheme: false),
             ),
           ),
         ],

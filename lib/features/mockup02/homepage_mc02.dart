@@ -108,7 +108,7 @@ class _HomePageMc02State extends State<HomePageMc02> {
                         )
                       : _aktifIndex == 3
                           ? const DesainPage()
-                  : ThemedDashboard(accentColor: Colors.purpleAccent, cardColor: Color(0xFF140224), backgroundColor: Color(0xFF0A0014), isLightTheme: false),
+                  : ThemedDashboard(layoutType: 'neon_purple', accentColor: Colors.purpleAccent, cardColor: Color(0xFF140224), backgroundColor: Color(0xFF0A0014), isLightTheme: false),
             ),
           ),
         ],

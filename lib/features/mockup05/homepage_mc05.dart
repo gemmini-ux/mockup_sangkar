@@ -89,7 +89,7 @@ class _HomePageMc05State extends State<HomePageMc05> {
                   )
                 : _tabAktif == 3
                     ? const DesainPage()
-            : ThemedDashboard(accentColor: Colors.tealAccent, cardColor: Color(0xFF003333), backgroundColor: Color(0xFF001A1A), isLightTheme: false),
+            : ThemedDashboard(layoutType: 'oceanic_teal', accentColor: Colors.tealAccent, cardColor: Color(0xFF003333), backgroundColor: Color(0xFF001A1A), isLightTheme: false),
       ),
       bottomNavigationBar: _BottomNavTeal(aktif: _tabAktif, onTap: (i) => setState(() => _tabAktif = i)),
     );

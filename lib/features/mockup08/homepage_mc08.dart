@@ -55,7 +55,7 @@ class _HomePageMc08State extends State<HomePageMc08> {
                   )
                 : _aktifMenu == 'Desain'
                     ? const DesainPage()
-            : ThemedDashboard(accentColor: Colors.pinkAccent, cardColor: Color(0xFF2E0C1B), backgroundColor: Color(0xFF1A0A0F), isLightTheme: false),
+            : ThemedDashboard(layoutType: 'sakura_pink', accentColor: Colors.pinkAccent, cardColor: Color(0xFF2E0C1B), backgroundColor: Color(0xFF1A0A0F), isLightTheme: false),
       ),
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,

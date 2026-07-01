@@ -49,7 +49,7 @@ class _HomePageMc10State extends State<HomePageMc10> {
                       )
                     : _aktifMenu == 'Desain'
                         ? const DesainPage()
-                : ThemedDashboard(accentColor: Colors.white, cardColor: Color(0xFF1E1E1E), backgroundColor: Color(0xFF101010), isLightTheme: false),
+                : ThemedDashboard(layoutType: 'monochrome_glass', accentColor: Colors.white, cardColor: Color(0xFF1E1E1E), backgroundColor: Color(0xFF101010), isLightTheme: false),
           ),
 
           // ── Tombol Buka Nav ──────────────────────────────

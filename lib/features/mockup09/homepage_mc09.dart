@@ -100,7 +100,7 @@ class _HomePageMc09State extends State<HomePageMc09> {
                         )
                       : _aktifIndex == 3
                           ? const DesainPage()
-                  : ThemedDashboard(accentColor: Colors.yellowAccent, cardColor: Color(0xFF262600), backgroundColor: Color(0xFF0A0A00), isLightTheme: false),
+                  : ThemedDashboard(layoutType: 'cyberpunk_yellow', accentColor: Colors.yellowAccent, cardColor: Color(0xFF262600), backgroundColor: Color(0xFF0A0A00), isLightTheme: false),
             ),
           ),
         ],
