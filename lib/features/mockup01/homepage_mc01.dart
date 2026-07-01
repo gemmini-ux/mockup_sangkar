@@ -25,6 +25,7 @@ import 'features/dashboard/notification_card.dart';
 
 import 'controllers/order_controller.dart';
 import 'controllers/stock_controller.dart';
+import 'controllers/sangkar_controller.dart';
 import 'features/placeholder/placeholder_page.dart';
 import 'features/pesanan/pesanan_page.dart';
 import 'features/produksi/produksi_page.dart';
@@ -32,6 +33,7 @@ import 'features/desain/desain_page.dart';
 import 'features/stok/stok_page.dart';
 import 'features/pelanggan/pelanggan_page.dart';
 import 'features/template/template_page.dart';
+import 'features/data_sangkar/data_sangkar_page.dart';
 
 class HomePageMc01 extends StatefulWidget {
   const HomePageMc01({super.key});
@@ -48,12 +50,14 @@ class _HomePageMc01State extends State<HomePageMc01> {
   @override
   void initState() {
     super.initState();
-    // Safety check to prevent duplicate bindings registration in GetX
     if (!Get.isRegistered<OrderController>()) {
       Get.put(OrderController());
     }
     if (!Get.isRegistered<StockController>()) {
       Get.put(StockController());
+    }
+    if (!Get.isRegistered<SangkarController>()) {
+      Get.put(SangkarController());
     }
   }
 
@@ -65,16 +69,16 @@ class _HomePageMc01State extends State<HomePageMc01> {
         case 0:
           _navBawahAktif = 0;
           break;
-        case 9:
+        case 10: // Produksi
           _navBawahAktif = 1;
           break;
-        case 10:
+        case 11: // Pesanan
           _navBawahAktif = 2;
           break;
-        case 5:
-          _navBawahAktif = 3; // Komponen maps to Stok page
+        case 6: // Komponen
+          _navBawahAktif = 3;
           break;
-        case 11:
+        case 12: // Pelanggan
           _navBawahAktif = 4;
           break;
         default:
@@ -92,16 +96,16 @@ class _HomePageMc01State extends State<HomePageMc01> {
           _menuAktif = 0;
           break;
         case 1:
-          _menuAktif = 9;
+          _menuAktif = 10; // Produksi
           break;
         case 2:
-          _menuAktif = 10;
+          _menuAktif = 11; // Pesanan
           break;
         case 3:
-          _menuAktif = 5;
+          _menuAktif = 6; // Komponen
           break;
         case 4:
-          _menuAktif = 11;
+          _menuAktif = 12; // Pelanggan
           break;
       }
     });
@@ -336,22 +340,25 @@ class _KontenUtama extends StatelessWidget {
 
     // Sub-halaman fungsional sesuai index menu
     switch (menuAktif) {
-      case 1: // Template
+      case 1: // Data Sangkar
+        return const DataSangkarPage();
+      case 2: // Template
         return const TemplatePage();
-      case 2: // Desain
+      case 3: // Desain
         return const DesainPage();
-      case 5: // Komponen (Stok)
+      case 6: // Komponen (Stok)
         return const StokPage();
-      case 9: // Produksi
+      case 10: // Produksi
         return const ProduksiPage();
-      case 10: // Pesanan
+      case 11: // Pesanan
         return const PesananPage();
-      case 11: // Pelanggan
+      case 12: // Pelanggan
         return const PelangganPage();
       default:
         // Render placeholder untuk draf menu lainnya
         final titles = [
           'Dashboard',
+          'Data Sangkar',
           'Template',
           'Desain',
           'Tema & Style',

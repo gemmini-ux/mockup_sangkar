@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'features/desain/desain_page.dart';
+import 'package:mocupsangkar/features/mockup01/features/data_sangkar/data_sangkar_page.dart';
+import 'package:mocupsangkar/features/mockup01/features/template/template_page.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/sangkar_controller.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/order_controller.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/stock_controller.dart';
 
 // MOCKUP 10 - Monochrome Glass | Glass Overlay Navigation | Frosted Reveal
 class HomePageMc10 extends StatefulWidget {
@@ -12,6 +17,13 @@ class HomePageMc10 extends StatefulWidget {
 class _HomePageMc10State extends State<HomePageMc10> {
   bool _navBuka = false;
   String _aktifMenu = 'Dashboard';
+  @override
+  void initState() {
+    super.initState();
+    if (!Get.isRegistered<OrderController>()) Get.put(OrderController());
+    if (!Get.isRegistered<StockController>()) Get.put(StockController());
+    if (!Get.isRegistered<SangkarController>()) Get.put(SangkarController());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +34,20 @@ class _HomePageMc10State extends State<HomePageMc10> {
           // ── Konten Utama ─────────────────────────────────
           Padding(
             padding: const EdgeInsets.only(top: 80, left: 20, right: 20, bottom: 20),
-            child: _aktifMenu == 'Desain'
-                ? const DesainPage()
+            child: _aktifMenu == 'Data Sangkar'
+                ? const DataSangkarPage(
+                    accentColor: Colors.white,
+                    cardColor: Color(0xFF1E1E1E),
+                    backgroundColor: Color(0xFF101010),
+                  )
+                : _aktifMenu == 'Template'
+                    ? const TemplatePage(
+                        accentColor: Colors.white,
+                        cardColor: Color(0xFF1E1E1E),
+                        backgroundColor: Color(0xFF101010),
+                      )
+                    : _aktifMenu == 'Desain'
+                        ? const DesainPage()
                 : Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -95,7 +119,7 @@ class _HomePageMc10State extends State<HomePageMc10> {
                         style: TextStyle(fontFamily: 'Poppins', fontSize: 13,
                           fontWeight: FontWeight.bold, color: Colors.white70, letterSpacing: 2)),
                       const Divider(color: Colors.white12),
-                      ...['Dashboard', 'Desain', 'Produksi', 'Pesanan', 'Stok']
+                      ...['Dashboard', 'Data Sangkar', 'Template', 'Desain']
                         .map((m) => ListTile(
                           title: Text(m, style: TextStyle(
                             fontFamily: 'Poppins', fontSize: 12, color: m == _aktifMenu ? Colors.white : Colors.white60, fontWeight: m == _aktifMenu ? FontWeight.bold : FontWeight.normal)),

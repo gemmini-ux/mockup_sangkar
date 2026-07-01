@@ -1,17 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'dart:math' as math;
 import 'package:mocupsangkar/features/mockup01/data/dummy_db.dart';
 import 'package:mocupsangkar/features/mockup01/models/sangkar_models.dart';
 import 'package:mocupsangkar/features/mockup01/features/pesanan/pesanan_form_page.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/sangkar_controller.dart';
 
 class TemplatePage extends StatefulWidget {
-  const TemplatePage({super.key});
+  final Color accentColor;
+  final Color cardColor;
+  final Color backgroundColor;
+  final bool isLightTheme;
+
+  const TemplatePage({
+    super.key,
+    this.accentColor = Colors.cyanAccent,
+    this.cardColor = const Color(0xFF101B2D),
+    this.backgroundColor = const Color(0xFF0C0A19),
+    this.isLightTheme = false,
+  });
 
   @override
   State<TemplatePage> createState() => _TemplatePageState();
 }
 
 class _TemplatePageState extends State<TemplatePage> {
+  final SangkarController _sangkarController = Get.find<SangkarController>();
+
   String _searchQuery = '';
   String _selectedCategory = 'Semua Kategori';
   String _statusFilter = 'Semua';
@@ -25,35 +40,46 @@ class _TemplatePageState extends State<TemplatePage> {
   bool _showDecalPattern = true;
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // If a template is selected for detail view, render the dedicated Detail Page
-    if (_viewingDetailTemplate != null) {
-      return _buildDedicatedDetailPage(_viewingDetailTemplate!);
-    }
+    return Obx(() {
+      final listTemplate = _sangkarController.templates;
 
-    // Otherwise, render the main Template Dashboard/Grid
-    final listTemplate = DummyDb.template;
+      // If a template is selected for detail view, render the dedicated Detail Page
+      if (_viewingDetailTemplate != null) {
+        final freshT = listTemplate.firstWhere(
+          (t) => t.id == _viewingDetailTemplate!.id,
+          orElse: () => _viewingDetailTemplate!,
+        );
+        return _buildDedicatedDetailPage(freshT);
+      }
 
-    // Calculate stats dynamically
-    final totalCount = listTemplate.length;
-    final draftCount = listTemplate.where((t) => t.status == 'Draft').length;
-    final activeCount = listTemplate.where((t) => t.status == 'Aktif').length;
-    final mostUsed = listTemplate.first; // Premium Lengkung 50
-    final lastCreated = listTemplate.firstWhere((t) => t.nama.contains('Minimalis'), orElse: () => listTemplate.first);
+      // Calculate stats dynamically
+      final totalCount = listTemplate.length;
+      final draftCount = listTemplate.where((t) => t.status == 'Draft').length;
+      final activeCount = listTemplate.where((t) => t.status == 'Aktif').length;
+      final mostUsed = listTemplate.isNotEmpty ? listTemplate.first : null;
+      final lastCreated = listTemplate.isNotEmpty
+          ? listTemplate.firstWhere((t) => t.kategori == 'kosan', orElse: () => listTemplate.first)
+          : null;
 
-    // Filter templates
-    final filteredTemplates = listTemplate.where((t) {
-      final matchSearch = t.nama.toLowerCase().contains(_searchQuery);
-      final matchCategory = _selectedCategory == 'Semua Kategori' || t.kategori == _selectedCategory;
-      final matchStatus = _statusFilter == 'Semua' || t.status == _statusFilter;
-      return matchSearch && matchCategory && matchStatus;
-    }).toList();
+      // Filter templates
+      final filteredTemplates = listTemplate.where((t) {
+        final matchSearch = t.nama.toLowerCase().contains(_searchQuery);
+        final matchCategory = _selectedCategory == 'Semua Kategori' || t.kategori == _selectedCategory;
+        final matchStatus = _statusFilter == 'Semua' || t.status == _statusFilter;
+        return matchSearch && matchCategory && matchStatus;
+      }).toList();
 
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+      return SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
           // ==========================================
           // TOP HEADER ROW
           // ==========================================
@@ -176,8 +202,8 @@ class _TemplatePageState extends State<TemplatePage> {
                   _buildMiniStatCard('Total Template', '$totalCount', 'Template tersimpan', Icons.inventory_2_outlined, Colors.purpleAccent, width: cardWidth),
                   _buildMiniStatCard('Draft', '$draftCount', 'Belum dipublish', Icons.edit_document, Colors.orangeAccent, width: cardWidth),
                   _buildMiniStatCard('Publik', '$activeCount', 'Siap digunakan', Icons.public, Colors.greenAccent, width: cardWidth),
-                  _buildMiniStatCard('Paling Digunakan', mostUsed.nama.split(' ').first, 'Digunakan 342x', Icons.star_border, Colors.amberAccent, width: cardWidth),
-                  _buildMiniStatCard('Terakhir Dibuat', lastCreated.nama.split(' ').first, lastCreated.tanggalDibuat, Icons.update, Colors.cyanAccent, width: cardWidth),
+                  _buildMiniStatCard('Paling Digunakan', mostUsed != null ? mostUsed.nama.split(' ').first : '-', 'Belum ada data', Icons.star_border, Colors.amberAccent, width: cardWidth),
+                  _buildMiniStatCard('Terakhir Dibuat', lastCreated != null ? lastCreated.nama.split(' ').first : '-', lastCreated != null ? lastCreated.tanggalDibuat : '-', Icons.update, Colors.cyanAccent, width: cardWidth),
                 ],
               );
             },
@@ -198,17 +224,17 @@ class _TemplatePageState extends State<TemplatePage> {
                   children: [
                     _buildLeftMenuSection('Kategori', [
                       _buildCategoryRow('Semua Kategori', totalCount, Icons.grid_view_rounded),
-                      _buildCategoryRow('Premium', 38, Icons.workspace_premium_outlined),
-                      _buildCategoryRow('Minimalis', 24, Icons.square_foot_outlined),
-                      _buildCategoryRow('Classic', 18, Icons.auto_awesome_outlined),
-                      _buildCategoryRow('Lengkung', 22, Icons.circle_outlined),
-                      _buildCategoryRow('Kotak', 16, Icons.check_box_outline_blank_rounded),
+                      _buildCategoryRow('kosan', listTemplate.where((t) => t.kategori == 'kosan').length, Icons.square_foot_outlined),
+                      _buildCategoryRow('diamond', listTemplate.where((t) => t.kategori == 'diamond').length, Icons.auto_awesome_outlined),
+                      _buildCategoryRow('tebok', listTemplate.where((t) => t.kategori == 'tebok').length, Icons.circle_outlined),
+                      _buildCategoryRow('bijian', listTemplate.where((t) => t.kategori == 'bijian').length, Icons.grid_on_outlined),
+                      _buildCategoryRow('BP', listTemplate.where((t) => t.kategori == 'BP').length, Icons.token_outlined),
                     ]),
                     const SizedBox(height: 16),
                     _buildLeftTagSection('Tag Populer', [
-                      'Premium', 'Lengkung', 'Elegan',
-                      'Minimalis', 'Kotak', 'Modern',
-                      'Gold', 'Classic'
+                      'kosan', 'diamond', 'tebok',
+                      'bijian', 'BP', 'Murai',
+                      'ceper', 'timbul'
                     ]),
                     const SizedBox(height: 16),
                     _buildLeftActionSection('Aksi Cepat'),
@@ -395,6 +421,7 @@ class _TemplatePageState extends State<TemplatePage> {
         ],
       ),
     );
+    });
   }
 
   // ==========================================
@@ -402,7 +429,7 @@ class _TemplatePageState extends State<TemplatePage> {
   // ==========================================
   Widget _buildDedicatedDetailPage(TemplateSangkar t) {
     final isAktif = t.status == 'Aktif';
-    final sangkar = DummyDb.jenisSangkar.firstWhere((s) => s.id == t.jenisSangkarId, orElse: () => DummyDb.jenisSangkar.first);
+    final sangkar = _sangkarController.cages.firstWhere((s) => s.id == t.jenisSangkarId, orElse: () => _sangkarController.cages.first);
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -588,6 +615,61 @@ class _TemplatePageState extends State<TemplatePage> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: _buildDetailActionButton(Icons.delete_outline, 'Hapus', () {}, isRed: true),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Get.dialog(
+                                Dialog(
+                                  backgroundColor: Colors.transparent,
+                                  child: Interactive3DView(
+                                    shape: sangkar.bentuk,
+                                    title: t.nama,
+                                    templateName: t.nama,
+                                  ),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.view_in_ar_outlined, size: 14, color: Colors.cyanAccent),
+                            label: const Text('Lihat 3D', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.cyanAccent)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF101B2D),
+                              foregroundColor: Colors.cyanAccent,
+                              side: BorderSide(color: Colors.cyanAccent.withValues(alpha: 0.3)),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Get.dialog(
+                                Dialog(
+                                  backgroundColor: Colors.transparent,
+                                  child: PdfPrintLayoutView(
+                                    template: t,
+                                    cage: sangkar,
+                                  ),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.print_outlined, size: 14, color: Colors.amberAccent),
+                            label: const Text('Cetak PDF', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.amberAccent)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF101B2D),
+                              foregroundColor: Colors.amberAccent,
+                              side: BorderSide(color: Colors.amberAccent.withValues(alpha: 0.3)),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -912,7 +994,7 @@ class _TemplatePageState extends State<TemplatePage> {
   }
 
   Widget _buildGridCard(TemplateSangkar t) {
-    final sangkar = DummyDb.jenisSangkar.firstWhere((s) => s.id == t.jenisSangkarId, orElse: () => DummyDb.jenisSangkar.first);
+    final sangkar = _sangkarController.cages.firstWhere((s) => s.id == t.jenisSangkarId, orElse: () => _sangkarController.cages.first);
 
     return InkWell(
       onTap: () {
@@ -940,11 +1022,51 @@ class _TemplatePageState extends State<TemplatePage> {
                   color: const Color(0xFF060D1A),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: CustomPaint(
-                  painter: BirdcageFramePainter(
-                    shape: sangkar.bentuk,
-                    color: Colors.white30,
-                  ),
+                child: Stack(
+                  children: [
+                    Center(
+                      child: CustomPaint(
+                        size: const Size(double.infinity, double.infinity),
+                        painter: BirdcageFramePainter(
+                          shape: sangkar.bentuk,
+                          color: Colors.white30,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: 4,
+                      top: 4,
+                      child: Tooltip(
+                        message: 'Pratinjau 3D',
+                        child: InkWell(
+                          onTap: () {
+                            Get.dialog(
+                              Dialog(
+                                backgroundColor: Colors.transparent,
+                                child: Interactive3DView(
+                                  shape: sangkar.bentuk,
+                                  title: t.nama,
+                                  templateName: t.nama,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: const BoxDecoration(
+                              color: const Color(0xFF101B2D),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.view_in_ar_outlined,
+                              color: Colors.cyanAccent,
+                              size: 14,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -967,7 +1089,6 @@ class _TemplatePageState extends State<TemplatePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Dipakai 128x', style: const TextStyle(fontSize: 8, color: Colors.white30)),
-                Text(t.harga, style: const TextStyle(fontSize: 10, color: Colors.greenAccent, fontWeight: FontWeight.bold)),
               ],
             ),
           ],
@@ -977,7 +1098,7 @@ class _TemplatePageState extends State<TemplatePage> {
   }
 
   Widget _buildListRow(TemplateSangkar t) {
-    final sangkar = DummyDb.jenisSangkar.firstWhere((s) => s.id == t.jenisSangkarId, orElse: () => DummyDb.jenisSangkar.first);
+    final sangkar = _sangkarController.cages.firstWhere((s) => s.id == t.jenisSangkarId, orElse: () => _sangkarController.cages.first);
 
     return InkWell(
       onTap: () {
@@ -1017,8 +1138,6 @@ class _TemplatePageState extends State<TemplatePage> {
               ),
             ),
             _buildCategoryPill(t.kategori),
-            const SizedBox(width: 12),
-            Text(t.harga, style: const TextStyle(fontSize: 11, color: Colors.greenAccent, fontWeight: FontWeight.bold)),
           ],
         ),
       ),
@@ -1028,17 +1147,20 @@ class _TemplatePageState extends State<TemplatePage> {
   Widget _buildCategoryPill(String cat) {
     Color badgeColor;
     switch (cat) {
-      case 'Premium':
-        badgeColor = Colors.orange;
+      case 'kosan':
+        badgeColor = Colors.orangeAccent;
         break;
-      case 'Minimalis':
-        badgeColor = Colors.blue;
+      case 'diamond':
+        badgeColor = Colors.cyanAccent;
         break;
-      case 'Classic':
+      case 'tebok':
         badgeColor = Colors.purpleAccent;
         break;
-      case 'Lengkung':
-        badgeColor = Colors.cyan;
+      case 'bijian':
+        badgeColor = Colors.greenAccent;
+        break;
+      case 'BP':
+        badgeColor = Colors.pinkAccent;
         break;
       default:
         badgeColor = Colors.grey;
@@ -1210,48 +1332,14 @@ class _TemplatePageState extends State<TemplatePage> {
 
   void _tampilkanDialogTemplateBaru(BuildContext context) {
     Get.dialog(
-      AlertDialog(
-        backgroundColor: const Color(0xFF0C0A19),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: Colors.cyanAccent, width: 0.5),
-        ),
-        title: const Text('BUAT TEMPLATE BARU', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Gunakan Blueprint Editor or Custom Canvas untuk merancang template baru.',
-              style: TextStyle(color: Colors.white70, fontSize: 11),
-            ),
-            const SizedBox(height: 12),
-            _buildDialogButton('Mulai dari Blueprint', () => Get.back()),
-            const SizedBox(height: 8),
-            _buildDialogButton('Unggah File CAD/Vector', () => Get.back(), isSecondary: true),
-          ],
-        ),
+      const Dialog(
+        backgroundColor: Colors.transparent,
+        child: CreateTemplateWizardDialog(),
       ),
     );
   }
 
-  Widget _buildDialogButton(String label, VoidCallback onTap, {bool isSecondary = false}) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: onTap,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isSecondary ? const Color(0xFF101B2D) : Colors.cyanAccent,
-          foregroundColor: isSecondary ? Colors.white : Colors.black,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-            side: isSecondary ? const BorderSide(color: Colors.white10) : BorderSide.none,
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 10),
-        ),
-        child: Text(label, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-      ),
-    );
-  }
+
 
   BoxDecoration _glassDecoration() {
     return BoxDecoration(
@@ -1265,16 +1353,7 @@ class _TemplatePageState extends State<TemplatePage> {
   // BAGIAN SANGKAR TAB COMPONENT
   // ==========================================
   Widget _buildBagianSangkarTab(TemplateSangkar t, JenisSangkar sangkar) {
-    final listBagian = [
-      'Kaki Kaki',
-      'Cantolan',
-      'Pelengkung',
-      'Cagak',
-      'Raen',
-      'Alas Bawah',
-      'Pintu',
-      'Tutup Atas',
-    ];
+    final listBagian = sangkar.bagian.map((b) => b.nama).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1558,97 +1637,39 @@ class _TemplatePageState extends State<TemplatePage> {
   }
 
   String _getPartSize(String partName, String sangkarId) {
-    if (sangkarId == 'SK-001') {
-      switch (partName) {
-        case 'Kaki Kaki':
-          return '4 sisi × 6 × 6 cm';
-        case 'Cantolan':
-          return 'T 18 cm × Ø 10 cm';
-        case 'Pelengkung':
-          return 'Keliling 141 cm × T 20 cm';
-        case 'Cagak':
-          return '4 tiang × T 60 cm';
-        case 'Raen':
-          return 'Depan 15 × 10 cm';
-        case 'Alas Bawah':
-          return 'Ø 45 cm × Tebal 2.5 cm';
-        case 'Pintu':
-          return '8 × 12 cm';
-        case 'Tutup Atas':
-          return 'Ø 12 cm';
-        default:
-          return 'Standar';
-      }
-    } else if (sangkarId == 'SK-002') {
-      switch (partName) {
-        case 'Kaki Kaki':
-          return '4 sisi × 4 × 4 cm';
-        case 'Cantolan':
-          return 'T 15 cm × Ø 8 cm';
-        case 'Pelengkung':
-          return 'Keliling 100 cm × T 12 cm';
-        case 'Cagak':
-          return '4 tiang × T 45 cm';
-        case 'Raen':
-          return 'Depan 12 × 8 cm';
-        case 'Alas Bawah':
-          return '35 × 28 cm × Tebal 2 cm';
-        case 'Pintu':
-          return '7 × 10 cm';
-        case 'Tutup Atas':
-          return 'Ø 10 cm';
-        default:
-          return 'Standar';
-      }
-    } else if (sangkarId == 'SK-003') {
-      switch (partName) {
-        case 'Kaki Kaki':
-          return '6 tiang × 3 × 3 cm';
-        case 'Cantolan':
-          return 'T 16 cm × Ø 9 cm';
-        case 'Pelengkung':
-          return 'Kubah Hex × T 15 cm';
-        case 'Cagak':
-          return '6 tiang × T 55 cm';
-        case 'Raen':
-          return 'Sisi depan 20 × 25 cm';
-        case 'Alas Bawah':
-          return 'Sisi 20 cm × Tebal 2 cm';
-        case 'Pintu':
-          return '8 × 11 cm';
-        case 'Tutup Atas':
-          return '10 × 10 cm';
-        default:
-          return 'Standar';
-      }
-    } else {
-      switch (partName) {
-        case 'Kaki Kaki':
-          return '4 sudut × 5 × 5 cm';
-        case 'Cantolan':
-          return 'T 14 cm × Ø 8 cm';
-        case 'Pelengkung':
-          return 'Atap 30 × 25 cm';
-        case 'Cagak':
-          return '4 tiang × T 40 cm';
-        case 'Raen':
-          return 'Panel depan 30 × 35 cm';
-        case 'Alas Bawah':
-          return '30 × 25 cm × Tebal 1.8 cm';
-        case 'Pintu':
-          return '8 × 10 cm';
-        case 'Tutup Atas':
-          return '10 × 8 cm';
-        default:
-          return 'Standar';
-      }
-    }
+    final sangkar = _sangkarController.cages.firstWhere((s) => s.id == sangkarId, orElse: () => _sangkarController.cages.first);
+    final part = sangkar.bagian.firstWhere(
+      (b) => b.nama == partName,
+      orElse: () => BagianSangkar(kode: '', nama: partName, ukuran: 'Standar', bentukArea: 'Datar', perluDecal: false),
+    );
+    return part.ukuran;
   }
 
   Widget _buildPartImageWidget(String partName) {
-    if (partName == 'Kaki Kaki') {
+    final cleanName = partName.toLowerCase();
+    String matchedName = 'Kaki Kaki';
+    if (cleanName.contains('cantolan')) {
+      matchedName = 'Cantolan';
+    } else if (cleanName.contains('raen')) {
+      matchedName = 'Raen';
+    } else if (cleanName.contains('pintu')) {
+      matchedName = 'Pintu';
+    } else if (cleanName.contains('alas')) {
+      matchedName = 'Alas Bawah';
+    } else if (cleanName.contains('kaki')) {
+      matchedName = 'Kaki Kaki';
+    } else if (cleanName.contains('tutup')) {
+      matchedName = 'Tutup Atas';
+    } else if (cleanName.contains('pelengkung')) {
+      matchedName = 'Pelengkung';
+    } else if (cleanName.contains('cagak')) {
+      matchedName = 'Cagak';
+    } else {
+      matchedName = 'Pintu';
+    }
+
+    if (matchedName == 'Kaki Kaki') {
       if (!_showDecalPattern) {
-        // Show raw cropped wood foot color-filtered to plain solid grey on a white background
         return Container(
           color: Colors.white,
           child: ClipRect(
@@ -1670,7 +1691,6 @@ class _TemplatePageState extends State<TemplatePage> {
           ),
         );
       } else {
-        // Show raw cropped wood foot in its original brown color
         return Container(
           color: const Color(0xFF0C0A19),
           child: ClipRect(
@@ -1690,27 +1710,27 @@ class _TemplatePageState extends State<TemplatePage> {
 
     Widget imageWidget;
 
-    if (partName == 'Cantolan') {
+    if (matchedName == 'Cantolan') {
       imageWidget = Image.asset(
         !_showDecalPattern ? 'assets/images/cantolan_polos.png' : 'assets/images/cantolan.png',
         fit: BoxFit.contain,
       );
-    } else if (partName == 'Pelengkung') {
+    } else if (matchedName == 'Pelengkung') {
       imageWidget = Image.asset(
         'assets/images/pelengkung.png',
         fit: BoxFit.contain,
       );
-    } else if (partName == 'Alas Bawah') {
+    } else if (matchedName == 'Alas Bawah') {
       imageWidget = Image.asset(
         !_showDecalPattern ? 'assets/images/alas_bawah_polos.png' : 'assets/images/alas_bawah.png',
         fit: BoxFit.contain,
       );
-    } else if (partName == 'Cagak') {
+    } else if (matchedName == 'Cagak') {
       imageWidget = Image.asset(
         'assets/images/cagak.png',
         fit: BoxFit.contain,
       );
-    } else if (partName == 'Raen') {
+    } else if (matchedName == 'Raen') {
       imageWidget = Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -1729,12 +1749,12 @@ class _TemplatePageState extends State<TemplatePage> {
           ),
         ],
       );
-    } else if (partName == 'Pintu') {
+    } else if (matchedName == 'Pintu') {
       imageWidget = Image.asset(
         'assets/images/pintu.png',
         fit: BoxFit.contain,
       );
-    } else if (partName == 'Tutup Atas') {
+    } else if (matchedName == 'Tutup Atas') {
       imageWidget = Image.asset(
         'assets/images/tutup_atas.png',
         fit: BoxFit.contain,
@@ -1754,14 +1774,68 @@ class _TemplatePageState extends State<TemplatePage> {
       );
     }
 
+    final t = _viewingDetailTemplate;
+    if (_showDecalPattern && t != null) {
+      final gradient = _getMotifGradient(t.nama);
+      return Container(
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.15,
+                child: CustomPaint(
+                  painter: DecalGridPainter(),
+                ),
+              ),
+            ),
+            Center(
+              child: Opacity(
+                opacity: 0.85,
+                child: ColorFiltered(
+                  colorFilter: const ColorFilter.mode(
+                    Colors.white70,
+                    BlendMode.srcIn,
+                  ),
+                  child: imageWidget,
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 6,
+              right: 8,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.black45,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  partName.split(':').last.trim().toUpperCase(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 8,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Container(
       color: !_showDecalPattern ? Colors.white : const Color(0xFF0C0A19),
       alignment: Alignment.center,
-      padding: partName == 'Raen' ? const EdgeInsets.symmetric(vertical: 4, horizontal: 8) : EdgeInsets.zero,
-      child: !_showDecalPattern && partName != 'Cantolan' && partName != 'Alas Bawah'
+      padding: matchedName == 'Raen' ? const EdgeInsets.symmetric(vertical: 4, horizontal: 8) : EdgeInsets.zero,
+      child: !_showDecalPattern && matchedName != 'Cantolan' && matchedName != 'Alas Bawah'
           ? ColorFiltered(
               colorFilter: const ColorFilter.mode(
-                Color(0xFFA0A0A0), // matching user's solid grey theme
+                Color(0xFFA0A0A0),
                 BlendMode.srcIn,
               ),
               child: imageWidget,
@@ -1770,7 +1844,6 @@ class _TemplatePageState extends State<TemplatePage> {
     );
   }
 }
-
 // ===========================================================
 // VECTOR FRAME PAINTER (Domes, Boxes, Ovals, Hexagons)
 // ===========================================================
@@ -1904,4 +1977,910 @@ class _IsometricLayerPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class CreateTemplateWizardDialog extends StatefulWidget {
+  const CreateTemplateWizardDialog({super.key});
+
+  @override
+  State<CreateTemplateWizardDialog> createState() => _CreateTemplateWizardDialogState();
+}
+
+class _CreateTemplateWizardDialogState extends State<CreateTemplateWizardDialog> {
+  final SangkarController _controller = Get.find<SangkarController>();
+  int _step = 1; // 1: Select Cage, 2: Select/Generate Motif, 3: Save Name
+
+  JenisSangkar? _selectedCage;
+  String? _selectedMotifName;
+  String _aiPrompt = '';
+  bool _isGeneratingAI = false;
+  String _aiStatus = '';
+  final TextEditingController _namaController = TextEditingController();
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 650, maxHeight: 520),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0C0A19),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.cyanAccent, width: 0.5),
+      ),
+      child: Column(
+        children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'BUAT TEMPLATE BARU — LANGKAH $_step DARI 3',
+                  style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1),
+                ),
+                IconButton(icon: const Icon(Icons.close, color: Colors.white54, size: 18), onPressed: () => Get.back()),
+              ],
+            ),
+          ),
+          const Divider(color: Colors.white10, height: 1),
+
+          // Main Wizard Content
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: _buildWizardStepContent(),
+            ),
+          ),
+
+          // Footer buttons
+          const Divider(color: Colors.white10, height: 1),
+          Container(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Back button
+                _step > 1
+                    ? OutlinedButton(
+                        onPressed: () => setState(() => _step--),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.white70,
+                          side: const BorderSide(color: Colors.white24),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        child: const Text('Sebelumnya', style: TextStyle(fontSize: 11)),
+                      )
+                    : const SizedBox.shrink(),
+
+                // Next / Save button
+                ElevatedButton(
+                  onPressed: _onNextPressed,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.cyanAccent,
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: Text(
+                    _step == 3 ? 'Simpan Template' : 'Selanjutnya',
+                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWizardStepContent() {
+    if (_step == 1) {
+      // Step 1: Select physical cage
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Langkah 1: Pilih Kerangka Fisik Sangkar', style: TextStyle(color: Colors.cyanAccent, fontSize: 13, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          const Text('Template akan dibuat berdasarkan dimensi dan komponen kerangka fisik ini.', style: TextStyle(color: Colors.white54, fontSize: 10)),
+          const SizedBox(height: 16),
+          ..._controller.cages.map((c) {
+            final isSelected = _selectedCage?.id == c.id;
+            return Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              decoration: BoxDecoration(
+                color: isSelected ? Colors.cyan.withValues(alpha: 0.1) : const Color(0xFF101B2D),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: isSelected ? Colors.cyanAccent : Colors.transparent, width: 0.5),
+              ),
+              child: ListTile(
+                title: Text(c.nama, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                subtitle: Text('${c.bentuk} • ${c.bagian.length} Bagian • ${c.ukuranTotal}', style: const TextStyle(color: Colors.white54, fontSize: 10)),
+                trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.cyanAccent, size: 18) : null,
+                onTap: () => setState(() => _selectedCage = c),
+              ),
+            );
+          }),
+        ],
+      );
+    } else if (_step == 2) {
+      // Step 2: Choose / Generate decal design
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Langkah 2: Pilih Desain Decal / Motif', style: TextStyle(color: Colors.cyanAccent, fontSize: 13, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 6),
+          const Text('Gunakan katalog preset atau buat motif baru menggunakan AI generator.', style: TextStyle(color: Colors.white54, fontSize: 10)),
+          const SizedBox(height: 20),
+
+          // Presets Catalog Title
+          const Text('Gambar Desain dari Database:', style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 10),
+          SizedBox(
+            height: 100,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: DummyDb.desainDecal.map((d) {
+                final isSelected = _selectedMotifName == d.nama;
+                return InkWell(
+                  onTap: () => setState(() {
+                    _selectedMotifName = d.nama;
+                    _aiPrompt = ''; // Reset AI prompt
+                  }),
+                  child: Container(
+                    width: 155,
+                    margin: const EdgeInsets.only(right: 8),
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: isSelected ? Colors.cyan.withValues(alpha: 0.1) : const Color(0xFF101B2D),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: isSelected ? Colors.cyanAccent : Colors.white10, width: 0.5),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          d.nama,
+                          style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text('Motif: ${d.motif}', style: const TextStyle(color: Colors.cyanAccent, fontSize: 8), maxLines: 1, overflow: TextOverflow.ellipsis),
+                        Text('Resolusi: ${d.resolusi}', style: const TextStyle(color: Colors.white30, fontSize: 8)),
+                        Text('Desainer: ${d.desainer}', style: const TextStyle(color: Colors.white30, fontSize: 8), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          const SizedBox(height: 24),
+          const Divider(color: Colors.white10),
+          const SizedBox(height: 16),
+
+          // AI Generator Input
+          const Text('Buat dengan AI Generator:', style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  style: const TextStyle(color: Colors.white, fontSize: 11),
+                  decoration: InputDecoration(
+                    hintText: 'Tulis prompt AI (misal: "Ornamen naga mistik dengan percikan bara api") ...',
+                    hintStyle: const TextStyle(color: Colors.white24, fontSize: 11),
+                    filled: true,
+                    fillColor: const Color(0xFF101B2D),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  ),
+                  onChanged: (val) => _aiPrompt = val,
+                ),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton.icon(
+                onPressed: _aiPrompt.trim().isEmpty ? null : _generateAIImage,
+                icon: const Icon(Icons.auto_awesome, size: 12, color: Colors.black),
+                label: const Text('Generate', style: TextStyle(color: Colors.black, fontSize: 11, fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.amberAccent,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+              ),
+            ],
+          ),
+          if (_isGeneratingAI) ...[
+            const SizedBox(height: 16),
+            Center(
+              child: Column(
+                children: [
+                  const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(color: Colors.cyanAccent, strokeWidth: 2),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(_aiStatus, style: const TextStyle(color: Colors.cyanAccent, fontSize: 10)),
+                ],
+              ),
+            ),
+          ],
+        ],
+      );
+    } else {
+      // Step 3: Name & Save
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Langkah 3: Beri Nama & Simpan Template', style: TextStyle(color: Colors.cyanAccent, fontSize: 13, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 20),
+          const Text('Nama Template Desain', style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          TextFormField(
+            controller: _namaController,
+            style: const TextStyle(color: Colors.white, fontSize: 12),
+            decoration: InputDecoration(
+              hintText: 'misal: Kosan R15 Dragon Phoenix Special',
+              hintStyle: const TextStyle(color: Colors.white24),
+              filled: true,
+              fillColor: const Color(0xFF101B2D),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+            ),
+          ),
+          const SizedBox(height: 24),
+          // Configuration summary box
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF101B2D),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Rangkuman Konfigurasi:', style: TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                _buildSummaryLine('Kerangka', _selectedCage?.nama ?? '-'),
+                _buildSummaryLine('Dimensi Cetak', _selectedCage?.ukuranTotal ?? '-'),
+                _buildSummaryLine('Bentuk', _selectedCage?.bentuk ?? '-'),
+                _buildSummaryLine('Desain Motif', _selectedMotifName ?? 'Kustom AI Design'),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+  }
+
+  Widget _buildSummaryLine(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: const TextStyle(color: Colors.white30, fontSize: 10)),
+          Text(value, style: const TextStyle(color: Colors.cyanAccent, fontSize: 10, fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
+  void _generateAIImage() async {
+    setState(() {
+      _isGeneratingAI = true;
+      _aiStatus = 'Menghubungkan ke AI Engine...';
+    });
+    await Future.delayed(const Duration(milliseconds: 800));
+    setState(() => _aiStatus = 'Menganalisis prompt...');
+    await Future.delayed(const Duration(milliseconds: 800));
+    setState(() => _aiStatus = 'Menggambar pola decal...');
+    await Future.delayed(const Duration(milliseconds: 800));
+    setState(() {
+      _isGeneratingAI = false;
+      _selectedMotifName = 'AI: ${_aiPrompt.length > 20 ? "${_aiPrompt.substring(0, 18)}..." : _aiPrompt}';
+    });
+    Get.snackbar(
+      'AI GENERATOR',
+      'Desain motif kustom berhasil dibuat',
+      backgroundColor: const Color(0xFF101B2D),
+      colorText: Colors.amberAccent,
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
+
+  void _onNextPressed() {
+    if (_step == 1) {
+      if (_selectedCage == null) {
+        Get.snackbar('PERINGATAN', 'Pilih kerangka fisik terlebih dahulu!', backgroundColor: const Color(0xFF0C0A19), colorText: Colors.orangeAccent);
+        return;
+      }
+      setState(() => _step = 2);
+    } else if (_step == 2) {
+      if (_selectedMotifName == null) {
+        Get.snackbar('PERINGATAN', 'Pilih motif dari katalog atau buat dengan AI!', backgroundColor: const Color(0xFF0C0A19), colorText: Colors.orangeAccent);
+        return;
+      }
+      _namaController.text = '${_selectedCage!.nama} - ${_selectedMotifName!}';
+      setState(() => _step = 3);
+    } else if (_step == 3) {
+      final name = _namaController.text.trim();
+      if (name.isEmpty) {
+        Get.snackbar('PERINGATAN', 'Masukkan nama template!', backgroundColor: const Color(0xFF0C0A19), colorText: Colors.orangeAccent);
+        return;
+      }
+
+      final newTemplate = TemplateSangkar(
+        id: 'TMP-${DateTime.now().millisecondsSinceEpoch}',
+        nama: name,
+        jenisSangkarId: _selectedCage!.id,
+        desainDecalIds: ['DSN-001'],
+        thumbnail: 'assets/thumb/tmp001.png',
+        popularitas: 90,
+        status: 'Aktif',
+        dimensi: _selectedCage!.ukuranTotal,
+        layers: _selectedCage!.bagian.length * 2,
+        kategori: _selectedCage!.nama.toLowerCase().contains('kosan')
+            ? 'kosan'
+            : _selectedCage!.nama.toLowerCase().contains('diamond')
+                ? 'diamond'
+                : _selectedCage!.nama.toLowerCase().contains('tebok')
+                    ? 'tebok'
+                    : _selectedCage!.nama.toLowerCase().contains('bijian')
+                        ? 'bijian'
+                        : 'BP',
+        komponen: {'Frame': 1, 'Ornamen': _selectedCage!.bagian.length, 'Background': 1},
+      );
+
+      _controller.addTemplate(newTemplate);
+
+      Get.back();
+      Get.snackbar(
+        'SUKSES',
+        'Template $name berhasil dibuat!',
+        backgroundColor: const Color(0xFF101B2D),
+        colorText: Colors.cyanAccent,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+}
+
+class Interactive3DView extends StatefulWidget {
+  final String shape;
+  final String title;
+  final String templateName;
+  const Interactive3DView({super.key, required this.shape, required this.title, required this.templateName});
+
+  @override
+  State<Interactive3DView> createState() => _Interactive3DViewState();
+}
+
+class _Interactive3DViewState extends State<Interactive3DView> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  double _rotationAngle = 0.0;
+  double _tiltAngle = 0.2; 
+  bool _autoSpin = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 10),
+    )..addListener(() {
+        if (_autoSpin) {
+          setState(() {
+            _rotationAngle += 0.01;
+          });
+        }
+      });
+    _controller.repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 600, maxHeight: 500),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0C0A19),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.cyanAccent, width: 0.5),
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    'PREVIEW 3D SANGKAR: ${widget.title.toUpperCase()}',
+                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white60, size: 18),
+                  onPressed: () => Get.back(),
+                ),
+              ],
+            ),
+          ),
+          const Divider(color: Colors.white10, height: 1),
+          Expanded(
+            child: GestureDetector(
+              onPanUpdate: (details) {
+                setState(() {
+                  _autoSpin = false;
+                  _rotationAngle += details.delta.dx * 0.01;
+                  _tiltAngle = (_tiltAngle - details.delta.dy * 0.01).clamp(-0.5, 0.5);
+                });
+              },
+              child: Container(
+                color: const Color(0xFF060D1A),
+                width: double.infinity,
+                child: CustomPaint(
+                  painter: Cage3DPainter(
+                    shape: widget.shape,
+                    rotation: _rotationAngle,
+                    tilt: _tiltAngle,
+                    templateName: widget.templateName,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(16),
+            color: const Color(0xFF101B2D),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Row(
+                  children: [
+                    Icon(Icons.rotate_left, color: Colors.cyanAccent, size: 16),
+                    SizedBox(width: 8),
+                    Text('Geser/Drag area gambar untuk rotasi bebas', style: TextStyle(color: Colors.white54, fontSize: 10)),
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Text('Auto Spin', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                    Switch(
+                      value: _autoSpin,
+                      activeThumbColor: Colors.cyanAccent,
+                      onChanged: (val) {
+                        setState(() {
+                          _autoSpin = val;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class Cage3DPainter extends CustomPainter {
+  final String shape;
+  final double rotation;
+  final double tilt;
+  final String templateName;
+
+  Cage3DPainter({required this.shape, required this.rotation, required this.tilt, required this.templateName});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final scale = size.width * 0.25;
+
+    final paintLine = Paint()
+      ..color = Colors.cyanAccent
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2;
+
+    final paintFill = Paint()
+      ..color = Colors.cyanAccent.withValues(alpha: 0.1)
+      ..style = PaintingStyle.fill;
+
+    final paintAccent = Paint()
+      ..color = Colors.orangeAccent
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+
+    int numPoints = 8;
+    if (shape.toLowerCase() == 'hexagon') {
+      numPoints = 6;
+    } else if (shape.toLowerCase() == 'kotak') {
+      numPoints = 4;
+    } else {
+      numPoints = 16; 
+    }
+
+    List<Offset> topPoints = [];
+    List<Offset> bottomPoints = [];
+    List<Offset> middlePoints = []; 
+
+    for (int i = 0; i < numPoints; i++) {
+      double angle = (2 * 3.14159 * i / numPoints) + rotation;
+      
+      double x = math.cos(angle);
+      double y = math.sin(angle);
+      
+      double topZ = -0.8;
+      double midZ = 0.5;
+      double bottomZ = 0.8;
+
+      topPoints.add(Offset(
+        center.dx + scale * x,
+        center.dy + scale * (y * math.sin(tilt) + topZ),
+      ));
+
+      middlePoints.add(Offset(
+        center.dx + scale * x,
+        center.dy + scale * (y * math.sin(tilt) + midZ),
+      ));
+
+      bottomPoints.add(Offset(
+        center.dx + scale * x,
+        center.dy + scale * (y * math.sin(tilt) + bottomZ),
+      ));
+    }
+
+    final pathAlas = Path()..moveTo(bottomPoints[0].dx, bottomPoints[0].dy);
+    for (int i = 1; i < numPoints; i++) {
+      pathAlas.lineTo(bottomPoints[i].dx, bottomPoints[i].dy);
+    }
+    pathAlas.close();
+    canvas.drawPath(pathAlas, paintFill);
+    canvas.drawPath(pathAlas, paintLine);
+
+    final pathDecal = Path()..moveTo(middlePoints[0].dx, middlePoints[0].dy);
+    for (int i = 1; i < numPoints; i++) {
+      pathDecal.lineTo(middlePoints[i].dx, middlePoints[i].dy);
+    }
+    for (int i = numPoints - 1; i >= 0; i--) {
+      pathDecal.lineTo(bottomPoints[i].dx, bottomPoints[i].dy);
+    }
+    pathDecal.close();
+    
+    final gradient = _getMotifGradient(templateName);
+    final rect = Rect.fromCircle(center: center, radius: scale);
+    final paintDecalFill = Paint()
+      ..shader = gradient.createShader(rect)
+      ..style = PaintingStyle.fill;
+    canvas.drawPath(pathDecal, paintDecalFill);
+
+    for (int i = 0; i < numPoints; i++) {
+      canvas.drawLine(topPoints[i], bottomPoints[i], paintLine..strokeWidth = 0.8);
+    }
+
+    final pathTop = Path()..moveTo(topPoints[0].dx, topPoints[0].dy);
+    for (int i = 1; i < numPoints; i++) {
+      pathTop.lineTo(topPoints[i].dx, topPoints[i].dy);
+    }
+    pathTop.close();
+    canvas.drawPath(pathTop, paintLine..strokeWidth = 1.5);
+
+    final topCenterPoint = Offset(center.dx, center.dy + scale * (-1.4));
+    for (int i = 0; i < numPoints; i += numPoints ~/ 4) {
+      canvas.drawLine(topPoints[i], topCenterPoint, paintAccent);
+    }
+    
+    canvas.drawCircle(topCenterPoint, 8, paintLine..strokeWidth = 1.5);
+  }
+
+  @override
+  bool shouldRepaint(covariant Cage3DPainter oldDelegate) {
+    return oldDelegate.rotation != rotation || oldDelegate.tilt != tilt || oldDelegate.shape != shape || oldDelegate.templateName != templateName;
+  }
+}
+
+class PdfPrintLayoutView extends StatelessWidget {
+  final TemplateSangkar template;
+  final JenisSangkar cage;
+  const PdfPrintLayoutView({super.key, required this.template, required this.cage});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 800, maxHeight: 600),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0C0A19),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.cyanAccent, width: 0.5),
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'PRINTOUT SHEET / POTONGAN DECAL: ${template.nama.toUpperCase()}',
+                      style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 1),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Layout cetak skala 1:1 dilengkapi batas potong (crop marks) dan kode percetakan',
+                      style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 10),
+                    ),
+                  ],
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white60, size: 18),
+                  onPressed: () => Get.back(),
+                ),
+              ],
+            ),
+          ),
+          const Divider(color: Colors.white10, height: 1),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 10, offset: const Offset(0, 4)),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                _buildCmykCircle(Colors.cyan),
+                                const SizedBox(width: 4),
+                                _buildCmykCircle(const Color(0xFFFF00FF)),
+                                const SizedBox(width: 4),
+                                _buildCmykCircle(Colors.yellow),
+                                const SizedBox(width: 4),
+                                _buildCmykCircle(Colors.black),
+                                const SizedBox(width: 12),
+                                const Text(
+                                  'REGISTRATION MARK • A4 STICKER MATTE',
+                                  style: TextStyle(color: Colors.black54, fontSize: 7, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            Text(
+                              'JOB_ID: TMP-${template.id.substring(template.id.length - 6)}',
+                              style: const TextStyle(color: Colors.black54, fontSize: 7, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        const Divider(color: Colors.black12, height: 1),
+                        const SizedBox(height: 16),
+                        Wrap(
+                          spacing: 20,
+                          runSpacing: 20,
+                          children: cage.bagian.map((b) {
+                            final gradient = _getMotifGradient(template.nama);
+                            return Container(
+                              width: 160,
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                border: Border.all(color: Colors.black38, width: 0.5, style: BorderStyle.solid),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Icon(Icons.crop_free, size: 10, color: Colors.black38),
+                                      Text(
+                                        b.bentukArea.toUpperCase(),
+                                        style: const TextStyle(fontSize: 6, color: Colors.black45, fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Container(
+                                    height: 70,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      gradient: gradient,
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Stack(
+                                      children: [
+                                        Positioned.fill(
+                                          child: Opacity(
+                                            opacity: 0.15,
+                                            child: CustomPaint(
+                                              painter: DecalGridPainter(),
+                                            ),
+                                          ),
+                                        ),
+                                        Center(
+                                          child: Text(
+                                            b.kode,
+                                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, shadows: [Shadow(color: Colors.black45, blurRadius: 4)]),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    b.nama,
+                                    style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.black87),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Ukuran: ${b.ukuran}',
+                                    style: const TextStyle(fontSize: 8, color: Colors.black54),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(16),
+            color: const Color(0xFF101B2D),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                OutlinedButton(
+                  onPressed: () => Get.back(),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white70,
+                    side: const BorderSide(color: Colors.white24),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: const Text('Tutup', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                ),
+                const SizedBox(width: 12),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Get.back();
+                    Get.snackbar(
+                      'CETAK PDF',
+                      'Menyiapkan layout PDF dan mengirim ke antrean printer...',
+                      backgroundColor: const Color(0xFF101B2D),
+                      colorText: Colors.cyanAccent,
+                      icon: const Icon(Icons.print, color: Colors.cyanAccent),
+                      snackPosition: SnackPosition.BOTTOM,
+                    );
+                  },
+                  icon: const Icon(Icons.print, size: 14, color: Colors.black),
+                  label: const Text('Kirim ke Printer / PDF', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.cyanAccent,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCmykCircle(Color color) {
+    return Container(
+      width: 8,
+      height: 8,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.black26, width: 0.5),
+      ),
+    );
+  }
+}
+
+LinearGradient _getMotifGradient(String motifName) {
+  final name = motifName.toLowerCase();
+  if (name.contains('dragon') || name.contains('red') || name.contains('fire') || name.contains('naga')) {
+    return const LinearGradient(
+      colors: [Color(0xFF6B0000), Color(0xFFE63900), Color(0xFFFF9900)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+  } else if (name.contains('tiger') || name.contains('shaman') || name.contains('green') || name.contains('harimau')) {
+    return const LinearGradient(
+      colors: [Color(0xFF071208), Color(0xFF00FF66), Color(0xFF003311)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+  } else if (name.contains('phoenix') || name.contains('gold') || name.contains('orange')) {
+    return const LinearGradient(
+      colors: [Color(0xFFFF3300), Color(0xFFFF9900), Color(0xFF3B0054)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+  } else if (name.contains('eagle') || name.contains('blue') || name.contains('hunter') || name.contains('rajawali')) {
+    return const LinearGradient(
+      colors: [Color(0xFF001B3B), Color(0xFF0088FF), Color(0xFF00001C)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+  } else {
+    int hash = motifName.hashCode;
+    int hue1 = (hash.abs() % 360);
+    int hue2 = ((hash.abs() + 140) % 360);
+    final color1 = HSVColor.fromAHSV(1.0, hue1.toDouble(), 0.85, 0.75).toColor();
+    final color2 = HSVColor.fromAHSV(1.0, hue2.toDouble(), 0.9, 0.4).toColor();
+    return LinearGradient(
+      colors: [color1, color2],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+  }
+}
+
+class DecalGridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.12)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.5;
+
+    const double step = 15;
+    for (double x = 0; x < size.width; x += step) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+    for (double y = 0; y < size.height; y += step) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+
+    final centerPaint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.15)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8;
+    canvas.drawCircle(Offset(size.width / 2, size.height / 2), 15, centerPaint);
+    canvas.drawCircle(Offset(size.width / 2, size.height / 2), 3, Paint()..color = Colors.white.withValues(alpha: 0.2));
+  }
+
+  @override
+  bool shouldRepaint(covariant DecalGridPainter oldDelegate) => false;
 }

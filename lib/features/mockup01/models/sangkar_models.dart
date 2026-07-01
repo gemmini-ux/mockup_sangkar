@@ -108,7 +108,6 @@ class TemplateSangkar {
   final String jenisSangkarId;
   final List<String> desainDecalIds; // list desain per bagian
   final String thumbnail;
-  final String harga;
   final int popularitas;
   final String status; // Aktif, Draft
   final String dimensi;
@@ -125,7 +124,6 @@ class TemplateSangkar {
     required this.jenisSangkarId,
     required this.desainDecalIds,
     required this.thumbnail,
-    required this.harga,
     required this.popularitas,
     required this.status,
     this.dimensi = '3200 x 4500 px',

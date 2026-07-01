@@ -7,6 +7,7 @@ class Sidebar extends StatelessWidget {
   Widget build(BuildContext context) {
     final menus = [
       (Icons.dashboard_outlined, "Dashboard"),
+      (Icons.list_alt_rounded, "Data Sangkar"),
       (Icons.grid_view_rounded, "Template"),
       (Icons.draw_outlined, "Desain"),
       (Icons.palette_outlined, "Tema & Style"),

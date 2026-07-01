@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'features/desain/desain_page.dart';
+import 'package:mocupsangkar/features/mockup01/features/data_sangkar/data_sangkar_page.dart';
+import 'package:mocupsangkar/features/mockup01/features/template/template_page.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/sangkar_controller.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/order_controller.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/stock_controller.dart';
 
 // MOCKUP 08 - Sakura Pink | Floating FAB Menu | Bloom Fade
 class HomePageMc08 extends StatefulWidget {
@@ -12,6 +17,13 @@ class HomePageMc08 extends StatefulWidget {
 class _HomePageMc08State extends State<HomePageMc08> {
   bool _fabBuka = false;
   String _aktifMenu = 'Dashboard';
+  @override
+  void initState() {
+    super.initState();
+    if (!Get.isRegistered<OrderController>()) Get.put(OrderController());
+    if (!Get.isRegistered<StockController>()) Get.put(StockController());
+    if (!Get.isRegistered<SangkarController>()) Get.put(SangkarController());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +40,20 @@ class _HomePageMc08State extends State<HomePageMc08> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: _aktifMenu == 'Desain'
-            ? const DesainPage()
+        child: _aktifMenu == 'Data Sangkar'
+            ? const DataSangkarPage(
+                accentColor: Colors.pinkAccent,
+                cardColor: Color(0xFF2E0C1B),
+                backgroundColor: Color(0xFF1A0A0F),
+              )
+            : _aktifMenu == 'Template'
+                ? const TemplatePage(
+                    accentColor: Colors.pinkAccent,
+                    cardColor: Color(0xFF2E0C1B),
+                    backgroundColor: Color(0xFF1A0A0F),
+                  )
+                : _aktifMenu == 'Desain'
+                    ? const DesainPage()
             : Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -49,7 +73,7 @@ class _HomePageMc08State extends State<HomePageMc08> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          if (_fabBuka) ...['Dashboard', 'Pesanan', 'Produksi', 'Desain'].map((m) => Padding(
+          if (_fabBuka) ...['Dashboard', 'Data Sangkar', 'Template', 'Desain'].map((m) => Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: FloatingActionButton.small(
               heroTag: m,

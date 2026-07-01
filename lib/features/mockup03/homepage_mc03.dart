@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'features/desain/desain_page.dart';
+import 'package:mocupsangkar/features/mockup01/features/data_sangkar/data_sangkar_page.dart';
+import 'package:mocupsangkar/features/mockup01/features/template/template_page.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/sangkar_controller.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/order_controller.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/stock_controller.dart';
 
 // ============================================================
 // HOMEPAGE MOCKUP 03 — Clean Minimalist
@@ -18,6 +23,13 @@ class HomePageMc03 extends StatefulWidget {
 
 class _HomePageMc03State extends State<HomePageMc03> {
   int _aktifIndex = 0;
+  @override
+  void initState() {
+    super.initState();
+    if (!Get.isRegistered<OrderController>()) Get.put(OrderController());
+    if (!Get.isRegistered<StockController>()) Get.put(StockController());
+    if (!Get.isRegistered<SangkarController>()) Get.put(SangkarController());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,10 +60,9 @@ class _HomePageMc03State extends State<HomePageMc03> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _buildTabItem('Dashboard', 0),
-                _buildTabItem('Desain', 1),
-                _buildTabItem('Produksi', 2),
-                _buildTabItem('Pesanan', 3),
-                _buildTabItem('Stok', 4),
+                _buildTabItem('Data Sangkar', 1),
+                _buildTabItem('Template', 2),
+                _buildTabItem('Desain', 3),
               ],
             ),
           ),
@@ -60,7 +71,21 @@ class _HomePageMc03State extends State<HomePageMc03> {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: _aktifIndex == 1
-            ? const DesainPage()
+            ? const DataSangkarPage(
+                accentColor: Colors.teal,
+                cardColor: Colors.white,
+                backgroundColor: Color(0xFFF8F9FA),
+                isLightTheme: true,
+              )
+            : _aktifIndex == 2
+                ? const TemplatePage(
+                    accentColor: Colors.teal,
+                    cardColor: Colors.white,
+                    backgroundColor: Color(0xFFF8F9FA),
+                    isLightTheme: true,
+                  )
+                : _aktifIndex == 3
+                    ? const DesainPage()
             : Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

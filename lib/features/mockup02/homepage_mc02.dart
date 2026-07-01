@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'features/desain/desain_page.dart';
+import 'package:mocupsangkar/features/mockup01/features/data_sangkar/data_sangkar_page.dart';
+import 'package:mocupsangkar/features/mockup01/features/template/template_page.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/sangkar_controller.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/order_controller.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/stock_controller.dart';
 
 // ============================================================
 // HOMEPAGE MOCKUP 02 — Neon Purple
@@ -19,6 +24,13 @@ class HomePageMc02 extends StatefulWidget {
 class _HomePageMc02State extends State<HomePageMc02> {
   bool _sidebarExpanded = true;
   int _aktifIndex = 0;
+  @override
+  void initState() {
+    super.initState();
+    if (!Get.isRegistered<OrderController>()) Get.put(OrderController());
+    if (!Get.isRegistered<StockController>()) Get.put(StockController());
+    if (!Get.isRegistered<SangkarController>()) Get.put(SangkarController());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,10 +72,9 @@ class _HomePageMc02State extends State<HomePageMc02> {
                   child: ListView(
                     children: [
                       _buildMenuItem(Icons.dashboard_outlined, 'Dashboard', 0),
-                      _buildMenuItem(Icons.draw_outlined, 'Desain', 1),
-                      _buildMenuItem(Icons.precision_manufacturing_outlined, 'Produksi', 2),
-                      _buildMenuItem(Icons.shopping_cart_outlined, 'Pesanan', 3),
-                      _buildMenuItem(Icons.inventory_2_outlined, 'Stok', 4),
+                      _buildMenuItem(Icons.grid_view_rounded, 'Data Sangkar', 1),
+                      _buildMenuItem(Icons.auto_awesome_motion_outlined, 'Template', 2),
+                      _buildMenuItem(Icons.draw_outlined, 'Desain', 3),
                     ],
                   ),
                 ),
@@ -83,7 +94,19 @@ class _HomePageMc02State extends State<HomePageMc02> {
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: _aktifIndex == 1
-                  ? const DesainPage()
+                  ? const DataSangkarPage(
+                      accentColor: Colors.purpleAccent,
+                      cardColor: Color(0xFF140224),
+                      backgroundColor: Color(0xFF0A0014),
+                    )
+                  : _aktifIndex == 2
+                      ? const TemplatePage(
+                          accentColor: Colors.purpleAccent,
+                          cardColor: Color(0xFF140224),
+                          backgroundColor: Color(0xFF0A0014),
+                        )
+                      : _aktifIndex == 3
+                          ? const DesainPage()
                   : Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'features/desain/desain_page.dart';
+import 'package:mocupsangkar/features/mockup01/features/data_sangkar/data_sangkar_page.dart';
+import 'package:mocupsangkar/features/mockup01/features/template/template_page.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/sangkar_controller.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/order_controller.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/stock_controller.dart';
 
 // ============================================================
 // HOMEPAGE MOCKUP 05 — Oceanic Teal
@@ -18,6 +23,13 @@ class HomePageMc05 extends StatefulWidget {
 
 class _HomePageMc05State extends State<HomePageMc05> {
   int _tabAktif = 0;
+  @override
+  void initState() {
+    super.initState();
+    if (!Get.isRegistered<OrderController>()) Get.put(OrderController());
+    if (!Get.isRegistered<StockController>()) Get.put(StockController());
+    if (!Get.isRegistered<SangkarController>()) Get.put(SangkarController());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +75,19 @@ class _HomePageMc05State extends State<HomePageMc05> {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: _tabAktif == 1
-            ? const DesainPage()
+            ? const DataSangkarPage(
+                accentColor: Colors.tealAccent,
+                cardColor: Color(0xFF003333),
+                backgroundColor: Color(0xFF001A1A),
+              )
+            : _tabAktif == 2
+                ? const TemplatePage(
+                    accentColor: Colors.tealAccent,
+                    cardColor: Color(0xFF003333),
+                    backgroundColor: Color(0xFF001A1A),
+                  )
+                : _tabAktif == 3
+                    ? const DesainPage()
             : Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -97,10 +121,9 @@ class _BottomNavTeal extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = [
       (Icons.dashboard_outlined,              'Dashboard'),
+      (Icons.grid_view_rounded,               'Data Sangkar'),
+      (Icons.auto_awesome_motion_outlined,    'Template'),
       (Icons.draw_outlined,                   'Desain'),
-      (Icons.precision_manufacturing_outlined,'Produksi'),
-      (Icons.shopping_cart_outlined,          'Pesanan'),
-      (Icons.inventory_2_outlined,            'Stok'),
     ];
     return Container(
       height: 68,

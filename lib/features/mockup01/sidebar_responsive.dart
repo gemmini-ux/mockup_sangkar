@@ -459,6 +459,7 @@ class _MenuTile extends StatelessWidget {
 // ── Daftar menu ───────────────────────────────────────────────
 List<(IconData, String)> _menus() => [
   (Icons.dashboard_outlined,              'Dashboard'),
+  (Icons.list_alt_rounded,               'Data Sangkar'),
   (Icons.grid_view_rounded,              'Template'),
   (Icons.draw_outlined,                  'Desain'),
   (Icons.palette_outlined,               'Tema & Style'),

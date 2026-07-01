@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'features/desain/desain_page.dart';
+import 'package:mocupsangkar/features/mockup01/features/data_sangkar/data_sangkar_page.dart';
+import 'package:mocupsangkar/features/mockup01/features/template/template_page.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/sangkar_controller.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/order_controller.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/stock_controller.dart';
 
 // ============================================================
 // HOMEPAGE MOCKUP 06 - Forest Green
@@ -17,6 +22,13 @@ class HomePageMc06 extends StatefulWidget {
 
 class _HomePageMc06State extends State<HomePageMc06> {
   int _railAktif = 0;
+  @override
+  void initState() {
+    super.initState();
+    if (!Get.isRegistered<OrderController>()) Get.put(OrderController());
+    if (!Get.isRegistered<StockController>()) Get.put(StockController());
+    if (!Get.isRegistered<SangkarController>()) Get.put(SangkarController());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,10 +58,9 @@ class _HomePageMc06State extends State<HomePageMc06> {
             ),
             destinations: const [
               NavigationRailDestination(icon: Icon(Icons.dashboard_outlined), label: Text('Board')),
+              NavigationRailDestination(icon: Icon(Icons.grid_view_rounded), label: Text('Data Sangkar')),
+              NavigationRailDestination(icon: Icon(Icons.auto_awesome_motion_outlined), label: Text('Template')),
               NavigationRailDestination(icon: Icon(Icons.draw_outlined), label: Text('Desain')),
-              NavigationRailDestination(icon: Icon(Icons.precision_manufacturing_outlined), label: Text('Produksi')),
-              NavigationRailDestination(icon: Icon(Icons.shopping_cart_outlined), label: Text('Pesanan')),
-              NavigationRailDestination(icon: Icon(Icons.people_outline), label: Text('CRM')),
             ],
           ),
           const VerticalDivider(color: Color(0xFF1A3A1A), width: 1),
@@ -57,7 +68,19 @@ class _HomePageMc06State extends State<HomePageMc06> {
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: _railAktif == 1
-                  ? const DesainPage()
+                  ? const DataSangkarPage(
+                      accentColor: Colors.greenAccent,
+                      cardColor: Color(0xFF142E14),
+                      backgroundColor: Color(0xFF0A1A0A),
+                    )
+                  : _railAktif == 2
+                      ? const TemplatePage(
+                          accentColor: Colors.greenAccent,
+                          cardColor: Color(0xFF142E14),
+                          backgroundColor: Color(0xFF0A1A0A),
+                        )
+                      : _railAktif == 3
+                          ? const DesainPage()
                   : Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

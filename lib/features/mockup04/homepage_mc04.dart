@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'features/desain/desain_page.dart';
+import 'package:mocupsangkar/features/mockup01/features/data_sangkar/data_sangkar_page.dart';
+import 'package:mocupsangkar/features/mockup01/features/template/template_page.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/sangkar_controller.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/order_controller.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/stock_controller.dart';
 
 // ============================================================
 // HOMEPAGE MOCKUP 04 — Retro Amber
@@ -18,6 +23,13 @@ class HomePageMc04 extends StatefulWidget {
 
 class _HomePageMc04State extends State<HomePageMc04> {
   int _aktifIndex = 0;
+  @override
+  void initState() {
+    super.initState();
+    if (!Get.isRegistered<OrderController>()) Get.put(OrderController());
+    if (!Get.isRegistered<StockController>()) Get.put(StockController());
+    if (!Get.isRegistered<SangkarController>()) Get.put(SangkarController());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +62,19 @@ class _HomePageMc04State extends State<HomePageMc04> {
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: _aktifIndex == 1
-                        ? const DesainPage()
+                        ? const DataSangkarPage(
+                            accentColor: Colors.amber,
+                            cardColor: Color(0xFF261800),
+                            backgroundColor: Color(0xFF1A1000),
+                          )
+                        : _aktifIndex == 2
+                            ? const TemplatePage(
+                                accentColor: Colors.amber,
+                                cardColor: Color(0xFF261800),
+                                backgroundColor: Color(0xFF1A1000),
+                              )
+                            : _aktifIndex == 3
+                                ? const DesainPage()
                         : Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -116,10 +140,9 @@ class _HomePageMc04State extends State<HomePageMc04> {
                 ),
                 const SizedBox(height: 16),
                 _buildSidebarItem(Icons.dashboard_outlined, 'Dashboard', 0),
-                _buildSidebarItem(Icons.draw_outlined, 'Desain', 1),
-                _buildSidebarItem(Icons.precision_manufacturing_outlined, 'Produksi', 2),
-                _buildSidebarItem(Icons.shopping_cart_outlined, 'Pesanan', 3),
-                _buildSidebarItem(Icons.inventory_2_outlined, 'Stok', 4),
+                _buildSidebarItem(Icons.grid_view_rounded, 'Data Sangkar', 1),
+                _buildSidebarItem(Icons.auto_awesome_motion_outlined, 'Template', 2),
+                _buildSidebarItem(Icons.draw_outlined, 'Desain', 3),
               ],
             ),
           ),

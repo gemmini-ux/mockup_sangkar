@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'features/desain/desain_page.dart';
+import 'package:mocupsangkar/features/mockup01/features/data_sangkar/data_sangkar_page.dart';
+import 'package:mocupsangkar/features/mockup01/features/template/template_page.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/sangkar_controller.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/order_controller.dart';
+import 'package:mocupsangkar/features/mockup01/controllers/stock_controller.dart';
 
 // MOCKUP 09 - Cyberpunk Yellow | Diagonal Sidebar | Glitch Flash
 class HomePageMc09 extends StatefulWidget {
@@ -12,10 +17,17 @@ class HomePageMc09 extends StatefulWidget {
 
 class _HomePageMc09State extends State<HomePageMc09> {
   int _aktifIndex = 0;
+  @override
+  void initState() {
+    super.initState();
+    if (!Get.isRegistered<OrderController>()) Get.put(OrderController());
+    if (!Get.isRegistered<StockController>()) Get.put(StockController());
+    if (!Get.isRegistered<SangkarController>()) Get.put(SangkarController());
+  }
 
   @override
   Widget build(BuildContext context) {
-    final menus = ['Dashboard', 'Desain', 'Produksi', 'Pesanan', 'Stok'];
+    final menus = ['Dashboard', 'Data Sangkar', 'Template', 'Desain'];
 
     return Scaffold(
       backgroundColor: const Color(0xFF0A0A00),
@@ -74,7 +86,19 @@ class _HomePageMc09State extends State<HomePageMc09> {
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: _aktifIndex == 1
-                  ? const DesainPage()
+                  ? const DataSangkarPage(
+                      accentColor: Colors.yellowAccent,
+                      cardColor: Color(0xFF262600),
+                      backgroundColor: Color(0xFF0A0A00),
+                    )
+                  : _aktifIndex == 2
+                      ? const TemplatePage(
+                          accentColor: Colors.yellowAccent,
+                          cardColor: Color(0xFF262600),
+                          backgroundColor: Color(0xFF0A0A00),
+                        )
+                      : _aktifIndex == 3
+                          ? const DesainPage()
                   : Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
