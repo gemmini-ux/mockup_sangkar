@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'dart:math' as math;
-import 'package:mocupsangkar/features/mockup01/controllers/order_controller.dart';
-import 'package:mocupsangkar/features/mockup01/controllers/sangkar_controller.dart';
+import 'package:mocupsangkar/features/mockup01/features/dashboard/dashboard.dart';
+import 'package:mocupsangkar/features/mockup01/features/dashboard/project_panel.dart';
+import 'package:mocupsangkar/features/mockup01/features/dashboard/activity_panel.dart';
+import 'package:mocupsangkar/features/mockup01/features/dashboard/schedule_panel.dart';
+import 'package:mocupsangkar/features/mockup01/features/dashboard/donut_chart_card.dart';
+import 'package:mocupsangkar/features/mockup01/features/dashboard/production_card.dart';
+import 'package:mocupsangkar/features/mockup01/features/dashboard/quick_access_card.dart';
+import 'package:mocupsangkar/features/mockup01/features/dashboard/notification_card.dart';
 
-class ThemedDashboard extends StatelessWidget {
+class ThemedDashboard extends StatefulWidget {
   final String layoutType;
   final Color accentColor;
   final Color cardColor;
@@ -21,879 +25,548 @@ class ThemedDashboard extends StatelessWidget {
   });
 
   @override
+  State<ThemedDashboard> createState() => _ThemedDashboardState();
+}
+
+class _ThemedDashboardState extends State<ThemedDashboard> {
+  // Used specifically by Mockup 05 Tabbed workflow
+  int _dashboardSubTab = 0;
+
+  @override
   Widget build(BuildContext context) {
-    final OrderController orderCtrl = Get.find<OrderController>();
-    final SangkarController sangkarCtrl = Get.find<SangkarController>();
+    final double spacing = 16.0;
 
-    final textColor = isLightTheme ? Colors.black87 : Colors.white;
-    final subtitleColor = isLightTheme ? Colors.black54 : Colors.white60;
+    switch (widget.layoutType) {
+      case 'neon_purple': // MOCKUP 02 - SPLIT COLUMN LEFT FOCUS
+        return _buildSplitColumnLayout(spacing);
 
-    return Obx(() {
-      switch (layoutType) {
-        case 'neon_purple':
-          return _buildNeonPurpleDashboard(orderCtrl, sangkarCtrl, textColor, subtitleColor);
-        case 'clean_minimalist':
-          return _buildCleanMinimalistDashboard(orderCtrl, sangkarCtrl, textColor, subtitleColor);
-        case 'retro_amber':
-          return _buildRetroAmberDashboard(orderCtrl, sangkarCtrl, textColor, subtitleColor);
-        case 'oceanic_teal':
-          return _buildOceanicTealDashboard(orderCtrl, sangkarCtrl, textColor, subtitleColor);
-        case 'forest_green':
-          return _buildForestGreenDashboard(orderCtrl, sangkarCtrl, textColor, subtitleColor);
-        case 'metallic_crimson':
-          return _buildMetallicCrimsonDashboard(orderCtrl, sangkarCtrl, textColor, subtitleColor);
-        case 'sakura_pink':
-          return _buildSakuraPinkDashboard(orderCtrl, sangkarCtrl, textColor, subtitleColor);
-        case 'cyberpunk_yellow':
-          return _buildCyberpunkYellowDashboard(orderCtrl, sangkarCtrl, textColor, subtitleColor);
-        case 'monochrome_glass':
-          return _buildMonochromeGlassDashboard(orderCtrl, sangkarCtrl, textColor, subtitleColor);
-        default:
-          return _buildDefaultDashboard(orderCtrl, sangkarCtrl, textColor, subtitleColor);
-      }
-    });
-  }
+      case 'clean_minimalist': // MOCKUP 03 - 3-COLUMN BENTO GRID
+        return _buildThreeColumnBentoGrid(spacing);
 
-  // =========================================================================
-  // 1. NEON PURPLE (MOCKUP 02) — NEON PROGRESS CIRCLES & GLOW GRID
-  // =========================================================================
-  Widget _buildNeonPurpleDashboard(OrderController orderCtrl, SangkarController sangkarCtrl, Color textColor, Color subtitleColor) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'ANALYTICS HUB — SYSTEM MONITOR',
-          style: TextStyle(fontFamily: 'Poppins', fontSize: 14, fontWeight: FontWeight.bold, color: accentColor, letterSpacing: 2),
-        ),
-        const SizedBox(height: 16),
-        // Neon Circles Row
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      case 'retro_amber': // MOCKUP 04 - SCHEDULE & ACTION CENTRIC
+        return _buildScheduleActionCentric(spacing);
+
+      case 'oceanic_teal': // MOCKUP 05 - TABBED SUB-VIEWS WORKFLOW
+        return _buildTabbedSubviewsWorkflow(spacing);
+
+      case 'forest_green': // MOCKUP 06 - STAGGERED SIDEBAR CARDS
+        return _buildStaggeredSidebarCards(spacing);
+
+      case 'metallic_crimson': // MOCKUP 07 - LINEAR PIPELINE ROWS
+        return _buildLinearPipelineRows(spacing);
+
+      case 'sakura_pink': // MOCKUP 08 - MASONRY PERCENTAGE WRAP
+        return _buildMasonryPercentageWrap(spacing);
+
+      case 'cyberpunk_yellow': // MOCKUP 09 - CYBER TERMINAL GRID
+        return _buildCyberTerminalGrid(spacing);
+
+      case 'monochrome_glass': // MOCKUP 10 - FROSTED STACK ROWS
+        return _buildFrostedStackRows(spacing);
+
+      default: // DEFAULT FALLBACK (SINGLE COLUMN STACK)
+        return Column(
           children: [
-            _buildCircularMeter('CETAK', 0.65, Colors.purpleAccent, textColor, subtitleColor),
-            _buildCircularMeter('POTONG', 0.45, Colors.pinkAccent, textColor, subtitleColor),
-            _buildCircularMeter('QC', 0.85, Colors.cyanAccent, textColor, subtitleColor),
+            const DashboardCard(),
+            SizedBox(height: spacing),
+            const ProjectPanel(),
+            SizedBox(height: spacing),
+            const ActivityPanel(),
           ],
-        ),
-        const SizedBox(height: 24),
-        // Neon Grid Table
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: cardColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: accentColor.withValues(alpha: 0.25), width: 1.0),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        );
+    }
+  }
+
+  // 1. MOCKUP 02 - Neon Purple (Split columns: Left Focus)
+  Widget _buildSplitColumnLayout(double spacing) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 800) {
+          return Column(
             children: [
-              Text('MONITORING ANTRIAN PRODUKSI', style: TextStyle(fontFamily: 'Poppins', fontSize: 11, fontWeight: FontWeight.bold, color: textColor)),
-              const SizedBox(height: 12),
-              ...orderCtrl.orders.take(3).map((o) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Container(width: 4, height: 16, color: accentColor),
-                          const SizedBox(width: 8),
-                          Text('${o.pelangganNama} — ${o.jenisSangkar}', style: TextStyle(fontSize: 10, color: textColor)),
-                        ],
-                      ),
-                      Text(o.statusProduksi.toUpperCase(), style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: accentColor)),
-                    ],
-                  ),
-                );
-              }),
+              const DashboardCard(),
+              SizedBox(height: spacing),
+              const ProductionCard(),
+              SizedBox(height: spacing),
+              const ProjectPanel(),
+              SizedBox(height: spacing),
+              const DonutChartCard(),
+              SizedBox(height: spacing),
+              const ActivityPanel(),
+              SizedBox(height: spacing),
+              const QuickAccessCard(),
             ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCircularMeter(String label, double val, Color meterColor, Color textColor, Color subtitleColor) {
-    return Column(
-      children: [
-        SizedBox(
-          width: 80,
-          height: 80,
-          child: CustomPaint(
-            painter: _NeonCirclePainter(percent: val, color: meterColor),
-            child: Center(
-              child: Text('${(val * 100).toInt()}%', style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.bold)),
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(label, style: TextStyle(color: subtitleColor, fontSize: 9, fontWeight: FontWeight.bold)),
-      ],
-    );
-  }
-
-  // =========================================================================
-  // 2. CLEAN MINIMALIST (MOCKUP 03) — FLAT BAR CHART & CLEAN BADGE LISTS
-  // =========================================================================
-  Widget _buildCleanMinimalistDashboard(OrderController orderCtrl, SangkarController sangkarCtrl, Color textColor, Color subtitleColor) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Overview Dashboard',
-          style: TextStyle(fontFamily: 'Poppins', fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
-        ),
-        const SizedBox(height: 16),
-        // Flat Bar Chart
-        Container(
-          height: 140,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Volume Order Harian', style: TextStyle(fontSize: 10, color: Colors.black38, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
-              Expanded(
-                child: CustomPaint(
-                  size: Size.infinite,
-                  painter: _FlatBarChartPainter(accent: accentColor),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
-        // Elegant List
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Daftar Kerangka Aktif', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black87)),
-              const SizedBox(height: 12),
-              ...sangkarCtrl.cages.take(3).map((c) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(c.nama, style: const TextStyle(fontSize: 11, color: Colors.black87)),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(color: accentColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
-                        child: Text(c.bentuk, style: TextStyle(fontSize: 9, color: accentColor, fontWeight: FontWeight.bold)),
-                      ),
-                    ],
-                  ),
-                );
-              }),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  // =========================================================================
-  // 3. RETRO AMBER (MOCKUP 04) — VINTAGE LEDGER SHEETS & RETRO CALENDAR
-  // =========================================================================
-  Widget _buildRetroAmberDashboard(OrderController orderCtrl, SangkarController sangkarCtrl, Color textColor, Color subtitleColor) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'VINTAGE LEDGER — JOURNAL BOOK',
-          style: TextStyle(fontFamily: 'Poppins', fontSize: 13, fontWeight: FontWeight.bold, color: accentColor, letterSpacing: 1),
-        ),
-        const SizedBox(height: 16),
-        // Ledger Board Container
-        Container(
-          decoration: BoxDecoration(
-            color: cardColor,
-            border: Border.all(color: accentColor, width: 1.0),
-          ),
-          child: Column(
-            children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(10),
-                color: accentColor.withValues(alpha: 0.1),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('JOURNAL ENTRY', style: TextStyle(fontFamily: 'Poppins', fontSize: 9, fontWeight: FontWeight.bold, color: accentColor)),
-                    Text('REF_ID: 104-X', style: TextStyle(fontFamily: 'Poppins', fontSize: 9, color: subtitleColor)),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: orderCtrl.orders.take(3).map((o) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('• ${o.pelangganNama.toUpperCase()}', style: TextStyle(fontFamily: 'Courier', fontSize: 11, color: textColor, fontWeight: FontWeight.bold)),
-                          Text('DECAL: ${o.motifDecal}', style: TextStyle(fontFamily: 'Courier', fontSize: 10, color: subtitleColor)),
-                          Text('[ ${o.statusProduksi} ]', style: TextStyle(fontFamily: 'Courier', fontSize: 10, color: accentColor, fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
-        // Retro Schedule Grid
-        Row(
-          children: [
-            _buildRetroDay('SEN', 'Murai Batu', true),
-            const SizedBox(width: 8),
-            _buildRetroDay('SEL', 'Kosan R15', false),
-            const SizedBox(width: 8),
-            _buildRetroDay('RAB', 'Diamond', true),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRetroDay(String day, String task, bool active) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: active ? accentColor.withValues(alpha: 0.08) : cardColor,
-          border: Border.all(color: active ? accentColor : Colors.white10),
-        ),
-        child: Column(
-          children: [
-            Text(day, style: TextStyle(fontFamily: 'Poppins', fontSize: 12, fontWeight: FontWeight.bold, color: active ? accentColor : Colors.white30)),
-            const SizedBox(height: 6),
-            Text(task, style: const TextStyle(fontSize: 8, color: Colors.white70), maxLines: 1, overflow: TextOverflow.ellipsis),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // =========================================================================
-  // 4. OCEANIC TEAL (MOCKUP 05) — WAVE AREA CHART & RIPPLED CARDS
-  // =========================================================================
-  Widget _buildOceanicTealDashboard(OrderController orderCtrl, SangkarController sangkarCtrl, Color textColor, Color subtitleColor) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'WAVE MATRIX — DECIBEL MONITOR',
-          style: TextStyle(fontFamily: 'Poppins', fontSize: 14, fontWeight: FontWeight.bold, color: accentColor, letterSpacing: 2),
-        ),
-        const SizedBox(height: 16),
-        // Wave Chart Panel
-        Container(
-          height: 130,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: cardColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: accentColor.withValues(alpha: 0.2)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Tingkat Produksi Riil', style: TextStyle(fontSize: 9, color: subtitleColor, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: CustomPaint(
-                    size: Size.infinite,
-                    painter: _WaveChartPainter(color: accentColor),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
-        // Rippled Cards Grid
-        Row(
-          children: [
-            _buildRippledCard('ACTIVE PRINT', '4 JOBS', Colors.tealAccent),
-            const SizedBox(width: 12),
-            _buildRippledCard('LAMINATING', '2 JOBS', Colors.cyanAccent),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRippledCard(String title, String val, Color highlightColor) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: highlightColor.withValues(alpha: 0.15)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: const TextStyle(fontSize: 8, color: Colors.white54, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 4),
-            Text(val, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: highlightColor)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // =========================================================================
-  // 5. FOREST GREEN (MOCKUP 06) — INVENTORY TREE GRID & GREEN CELLS
-  // =========================================================================
-  Widget _buildForestGreenDashboard(OrderController orderCtrl, SangkarController sangkarCtrl, Color textColor, Color subtitleColor) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'ECO MONITOR — STOCK TREE',
-          style: TextStyle(fontFamily: 'Poppins', fontSize: 13, fontWeight: FontWeight.bold, color: accentColor, letterSpacing: 1),
-        ),
-        const SizedBox(height: 16),
-        // Tree Inventory List
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: cardColor,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: accentColor.withValues(alpha: 0.15)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Daftar Inventaris Lembaran Decal', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: textColor)),
-              const SizedBox(height: 12),
-              _buildTreeItem('Bahan Sticker Matte', '95 Lembar (A4)', true),
-              _buildTreeItem('Laminasi Glossy Roll', '12 Roll Aktif', false),
-              _buildTreeItem('Tinta Cyan/Magenta/Yellow', 'Status Penuh (100%)', true),
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
-        // Cell status
-        Row(
-          children: [
-            _buildGreenCell('Laminator', 'STABIL'),
-            const SizedBox(width: 8),
-            _buildGreenCell('Cutter', 'SIAGA'),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTreeItem(String category, String value, bool isSub) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Icon(Icons.subdirectory_arrow_right, size: 12, color: accentColor),
-          const SizedBox(width: 8),
-          Text(category, style: const TextStyle(fontSize: 10, color: Colors.white70)),
-          const Spacer(),
-          Text(value, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: accentColor)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildGreenCell(String machine, String status) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.circular(4),
-          border: Border.all(color: accentColor.withValues(alpha: 0.2)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(machine, style: const TextStyle(fontSize: 10, color: Colors.white70)),
-            Text(status, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: accentColor)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // =========================================================================
-  // 6. METALLIC CRIMSON (MOCKUP 07) — SHIMMER TIMELINE & TOP POPULARITY
-  // =========================================================================
-  Widget _buildMetallicCrimsonDashboard(OrderController orderCtrl, SangkarController sangkarCtrl, Color textColor, Color subtitleColor) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'CRIMSON PIPELINE — SHIMMER STATUS',
-          style: TextStyle(fontFamily: 'Poppins', fontSize: 13, fontWeight: FontWeight.bold, color: accentColor, letterSpacing: 1),
-        ),
-        const SizedBox(height: 16),
-        // Timeline status
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: cardColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: accentColor.withValues(alpha: 0.2)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildTimelineStep('1. Pencetakan Decal', 'Proses transfer motif ke stiker', true),
-              _buildTimelineStep('2. Laminating Doff/Gloss', 'Pelapisan anti air stiker', true),
-              _buildTimelineStep('3. Pemotongan Pola', 'Batas potong menggunakan plotter', false),
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
-        // Top designs
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: cardColor,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: accentColor.withValues(alpha: 0.1)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Motif Paling Digemari', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: textColor)),
-              const SizedBox(height: 8),
-              _buildPopularItem('Red Dragon Fighter', '92% Popularitas'),
-              _buildPopularItem('Phoenix Gold Reborn', '87% Popularitas'),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTimelineStep(String stepName, String desc, bool isDone) {
-    return Row(
-      children: [
-        Icon(isDone ? Icons.check_circle : Icons.radio_button_unchecked, size: 16, color: isDone ? accentColor : Colors.white24),
-        const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(stepName, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isDone ? Colors.white : Colors.white30)),
-            Text(desc, style: const TextStyle(fontSize: 8, color: Colors.white54)),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPopularItem(String name, String rate) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(name, style: const TextStyle(fontSize: 10, color: Colors.white70)),
-          Text(rate, style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: accentColor)),
-        ],
-      ),
-    );
-  }
-
-  // =========================================================================
-  // 7. SAKURA PINK (MOCKUP 08) — MASONRY BLOOM CARDS & PETAL CHART
-  // =========================================================================
-  Widget _buildSakuraPinkDashboard(OrderController orderCtrl, SangkarController sangkarCtrl, Color textColor, Color subtitleColor) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'SAKURA PETAL GRID — MASONRY LAYOUT',
-          style: TextStyle(fontFamily: 'Poppins', fontSize: 13, fontWeight: FontWeight.bold, color: accentColor, letterSpacing: 1),
-        ),
-        const SizedBox(height: 16),
-        // Petal/Flower Chart
-        Container(
-          height: 120,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: cardColor,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: accentColor.withValues(alpha: 0.15)),
-          ),
-          child: CustomPaint(
-            size: const Size(100, 100),
-            painter: _SakuraPetalPainter(color: accentColor),
-          ),
-        ),
-        const SizedBox(height: 20),
-        // Masonry Cards Row
-        Row(
+          );
+        }
+        return Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: _buildMasonryCard('PROYEK INDAH', 'Murai Batu Borneo custom decal premium pink sakura border.', 110),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildMasonryCard('STATUS AKTIF', '5 Pesanan aktif terdaftar.', 90),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMasonryCard(String title, String content, double height) {
-    return Container(
-      height: height,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: accentColor.withValues(alpha: 0.1)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: TextStyle(fontSize: 8, color: accentColor, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 6),
-          Expanded(
-            child: Text(content, style: const TextStyle(fontSize: 9, color: Colors.white70), maxLines: 3, overflow: TextOverflow.ellipsis),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // =========================================================================
-  // 8. CYBERPUNK YELLOW (MOCKUP 09) — TERMINAL LOGS & DIAGONAL CHARTS
-  // =========================================================================
-  Widget _buildCyberpunkYellowDashboard(OrderController orderCtrl, SangkarController sangkarCtrl, Color textColor, Color subtitleColor) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'CYBER SYSTEM CONSOLE // ROOT@DECAL',
-          style: TextStyle(fontFamily: 'Poppins', fontSize: 13, fontWeight: FontWeight.bold, color: accentColor, letterSpacing: 1),
-        ),
-        const SizedBox(height: 16),
-        // Cyberpunk terminal logs console screen
-        Container(
-          height: 150,
-          width: double.infinity,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.black,
-            border: Border.all(color: accentColor, width: 1.0),
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildConsoleLine('SYSTEM STATUS: ONLINE', 'OK'),
-                _buildConsoleLine('CONNECTING AI ENGINE...', 'DONE'),
-                _buildConsoleLine('LOAD DECAL TEMPLATE CACHE', '12 L'),
-                _buildConsoleLine('PRINTER DEVICE PORT: 6301', 'ACTIVE'),
-                _buildConsoleLine('INVENTORY MATTE STICKER', '95/100'),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 20),
-        // Diagonal metrics
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: cardColor,
-            border: Border(left: BorderSide(color: accentColor, width: 4)),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('ANTREAN AKTIF SEKARANG', style: TextStyle(fontSize: 10, color: textColor, fontWeight: FontWeight.bold)),
-              Text('${orderCtrl.orders.length} PROSES', style: TextStyle(fontSize: 12, color: accentColor, fontWeight: FontWeight.bold)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildConsoleLine(String prompt, String status) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text('> $prompt', style: const TextStyle(fontFamily: 'Courier', fontSize: 9, color: Colors.greenAccent)),
-          Text('[ $status ]', style: TextStyle(fontFamily: 'Courier', fontSize: 9, color: accentColor, fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
-
-  // =========================================================================
-  // 9. MONOCHROME GLASS (MOCKUP 10) — FROSTED GLASS CONSOLE & MONO GRAPH
-  // =========================================================================
-  Widget _buildMonochromeGlassDashboard(OrderController orderCtrl, SangkarController sangkarCtrl, Color textColor, Color subtitleColor) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'GLASS CONSOLE — MONOCHROME VISUALS',
-          style: TextStyle(fontFamily: 'Poppins', fontSize: 13, fontWeight: FontWeight.bold, color: accentColor, letterSpacing: 1),
-        ),
-        const SizedBox(height: 16),
-        // Frosted glass card
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              flex: 3,
+              child: Column(
                 children: [
-                  const Text('Rangkuman Skala Cetak', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white)),
-                  Icon(Icons.blur_circular, color: accentColor, size: 18),
+                  const DashboardCard(),
+                  SizedBox(height: spacing),
+                  const ProductionCard(),
+                  SizedBox(height: spacing),
+                  const ProjectPanel(),
                 ],
               ),
-              const SizedBox(height: 16),
-              // Frosted Mono Line Graph
-              SizedBox(
-                height: 60,
-                width: double.infinity,
-                child: CustomPaint(
-                  painter: _MonoLinePainter(),
-                ),
+            ),
+            SizedBox(width: spacing),
+            Expanded(
+              flex: 2,
+              child: Column(
+                children: [
+                  const DonutChartCard(),
+                  SizedBox(height: spacing),
+                  const ActivityPanel(),
+                  SizedBox(height: spacing),
+                  const QuickAccessCard(),
+                ],
               ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // 2. MOCKUP 03 - Clean Minimalist (3-Column Bento Grid)
+  Widget _buildThreeColumnBentoGrid(double spacing) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 900) {
+          return Column(
+            children: [
+              const DashboardCard(),
+              SizedBox(height: spacing),
+              const ProjectPanel(),
+              SizedBox(height: spacing),
+              const ProductionCard(),
+              SizedBox(height: spacing),
+              const ActivityPanel(),
+            ],
+          );
+        }
+        return Column(
+          children: [
+            const DashboardCard(),
+            SizedBox(height: spacing),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Col 1
+                Expanded(
+                  child: Column(
+                    children: [
+                      const ProjectPanel(),
+                      SizedBox(height: spacing),
+                      const DonutChartCard(),
+                    ],
+                  ),
+                ),
+                SizedBox(width: spacing),
+                // Col 2
+                Expanded(
+                  child: Column(
+                    children: [
+                      const ProductionCard(),
+                      SizedBox(height: spacing),
+                      const QuickAccessCard(),
+                    ],
+                  ),
+                ),
+                SizedBox(width: spacing),
+                // Col 3
+                Expanded(
+                  child: Column(
+                    children: [
+                      const ActivityPanel(),
+                      SizedBox(height: spacing),
+                      const NotificationCard(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // 3. MOCKUP 04 - Retro Amber (Schedule & Action Centric)
+  Widget _buildScheduleActionCentric(double spacing) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 800) {
+          return Column(
+            children: [
+              const DashboardCard(),
+              SizedBox(height: spacing),
+              const SchedulePanel(),
+              SizedBox(height: spacing),
+              const QuickAccessCard(),
+              SizedBox(height: spacing),
+              const ProjectPanel(),
+            ],
+          );
+        }
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 2,
+              child: Column(
+                children: [
+                  const SchedulePanel(),
+                  SizedBox(height: spacing),
+                  const QuickAccessCard(),
+                  SizedBox(height: spacing),
+                  const NotificationCard(),
+                ],
+              ),
+            ),
+            SizedBox(width: spacing),
+            Expanded(
+              flex: 3,
+              child: Column(
+                children: [
+                  const DashboardCard(),
+                  SizedBox(height: spacing),
+                  const ProjectPanel(),
+                  SizedBox(height: spacing),
+                  const DonutChartCard(),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // 4. MOCKUP 05 - Oceanic Teal (Tabbed Dashboard Sections)
+  Widget _buildTabbedSubviewsWorkflow(double spacing) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Sub-Tab bar
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: widget.cardColor,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            children: [
+              _buildSubTabButton('Utama', 0),
+              _buildSubTabButton('Produksi & Log', 1),
+              _buildSubTabButton('Aksi & Pesan', 2),
             ],
           ),
         ),
-        const SizedBox(height: 20),
-        // Frosted metrics
-        Container(
-          padding: const EdgeInsets.all(16),
+        const SizedBox(height: 16),
+        // Active Sub-Tab View
+        _dashboardSubTab == 0
+            ? Column(
+                children: [
+                  const DashboardCard(),
+                  SizedBox(height: spacing),
+                  const ProductionCard(),
+                  SizedBox(height: spacing),
+                  const DonutChartCard(),
+                ],
+              )
+            : _dashboardSubTab == 1
+                ? Column(
+                    children: [
+                      const ProjectPanel(),
+                      SizedBox(height: spacing),
+                      const ActivityPanel(),
+                      SizedBox(height: spacing),
+                      const SchedulePanel(),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      const QuickAccessCard(),
+                      SizedBox(height: spacing),
+                      const NotificationCard(),
+                    ],
+                  ),
+      ],
+    );
+  }
+
+  Widget _buildSubTabButton(String label, int index) {
+    final isSel = _dashboardSubTab == index;
+    return Expanded(
+      child: InkWell(
+        onTap: () => setState(() => _dashboardSubTab = index),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.03),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            color: isSel ? widget.accentColor.withValues(alpha: 0.15) : Colors.transparent,
+            borderRadius: BorderRadius.circular(6),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: isSel ? widget.accentColor : (widget.isLightTheme ? Colors.black54 : Colors.white54),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 5. MOCKUP 06 - Forest Green (Staggered Sidebar Cards)
+  Widget _buildStaggeredSidebarCards(double spacing) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 800) {
+          return Column(
             children: [
-              const Text('TOTAL BLUEPRINTS GENERATED', style: TextStyle(fontSize: 9, color: Colors.white60, fontWeight: FontWeight.bold)),
-              Text('${sangkarCtrl.templates.length * 8} PCS', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: accentColor)),
+              const DashboardCard(),
+              SizedBox(height: spacing),
+              const SchedulePanel(),
+              SizedBox(height: spacing),
+              const ProjectPanel(),
             ],
-          ),
+          );
+        }
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 5,
+              child: Column(
+                children: [
+                  const DashboardCard(),
+                  SizedBox(height: spacing),
+                  const ActivityPanel(),
+                  SizedBox(height: spacing),
+                  const DonutChartCard(),
+                ],
+              ),
+            ),
+            SizedBox(width: spacing),
+            Expanded(
+              flex: 4,
+              child: Column(
+                children: [
+                  const SchedulePanel(),
+                  SizedBox(height: spacing),
+                  const ProjectPanel(),
+                  SizedBox(height: spacing),
+                  const QuickAccessCard(),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // 6. MOCKUP 07 - Metallic Crimson (Linear Pipeline Rows)
+  Widget _buildLinearPipelineRows(double spacing) {
+    return Column(
+      children: [
+        const DashboardCard(),
+        SizedBox(height: spacing),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 650) {
+              return Column(
+                children: [
+                  const ProductionCard(),
+                  SizedBox(height: spacing),
+                  const DonutChartCard(),
+                ],
+              );
+            }
+            return Row(
+              children: [
+                const Expanded(child: ProductionCard()),
+                SizedBox(width: spacing),
+                const Expanded(child: DonutChartCard()),
+              ],
+            );
+          },
+        ),
+        SizedBox(height: spacing),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 750) {
+              return Column(
+                children: [
+                  const ProjectPanel(),
+                  SizedBox(height: spacing),
+                  const NotificationCard(),
+                ],
+              );
+            }
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Expanded(flex: 3, child: ProjectPanel()),
+                SizedBox(width: spacing),
+                const Expanded(flex: 2, child: NotificationCard()),
+              ],
+            );
+          },
         ),
       ],
     );
   }
 
-  // =========================================================================
-  // DEFAULT / FALLBACK (MOCKUP 01 STYLE)
-  // =========================================================================
-  Widget _buildDefaultDashboard(OrderController orderCtrl, SangkarController sangkarCtrl, Color textColor, Color subtitleColor) {
-    return Center(
-      child: Text('Dashboard Placeholder', style: TextStyle(color: textColor)),
+  // 7. MOCKUP 08 - Sakura Pink (Masonry Percentage Wrap)
+  Widget _buildMasonryPercentageWrap(double spacing) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final w = constraints.maxWidth;
+        if (w < 800) {
+          return Column(
+            children: [
+              const DashboardCard(),
+              SizedBox(height: spacing),
+              const DonutChartCard(),
+              SizedBox(height: spacing),
+              const ProjectPanel(),
+              SizedBox(height: spacing),
+              const QuickAccessCard(),
+            ],
+          );
+        }
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: [
+            SizedBox(
+              width: w,
+              child: const DashboardCard(),
+            ),
+            SizedBox(
+              width: w * 0.38 - (spacing / 2),
+              child: const DonutChartCard(),
+            ),
+            SizedBox(
+              width: w * 0.62 - (spacing / 2),
+              child: const ProjectPanel(),
+            ),
+            SizedBox(
+              width: w * 0.48 - (spacing / 2),
+              child: const QuickAccessCard(),
+            ),
+            SizedBox(
+              width: w * 0.52 - (spacing / 2),
+              child: const ActivityPanel(),
+            ),
+          ],
+        );
+      },
     );
   }
-}
 
-// =========================================================================
-// CUSTOM PAINTERS FOR THE GRAPHS
-// =========================================================================
-
-class _NeonCirclePainter extends CustomPainter {
-  final double percent;
-  final Color color;
-  _NeonCirclePainter({required this.percent, required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paintBg = Paint()
-      ..color = Colors.white.withValues(alpha: 0.05)
-      ..strokeWidth = 4
-      ..style = PaintingStyle.stroke;
-
-    final paintFg = Paint()
-      ..color = color
-      ..strokeWidth = 4
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
-
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2 - 4;
-    canvas.drawCircle(center, radius, paintBg);
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -math.pi / 2,
-      2 * math.pi * percent,
-      false,
-      paintFg,
+  // 8. MOCKUP 09 - Cyberpunk Yellow (Cyber Terminal Grid)
+  Widget _buildCyberTerminalGrid(double spacing) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 850) {
+          return Column(
+            children: [
+              const QuickAccessCard(),
+              SizedBox(height: spacing),
+              const DashboardCard(),
+              SizedBox(height: spacing),
+              const ProductionCard(),
+              SizedBox(height: spacing),
+              const SchedulePanel(),
+            ],
+          );
+        }
+        return Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Expanded(flex: 2, child: QuickAccessCard()),
+                SizedBox(width: spacing),
+                const Expanded(flex: 3, child: DashboardCard()),
+              ],
+            ),
+            SizedBox(height: spacing),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Expanded(flex: 3, child: ProductionCard()),
+                SizedBox(width: spacing),
+                const Expanded(flex: 2, child: SchedulePanel()),
+              ],
+            ),
+            SizedBox(height: spacing),
+            const ActivityPanel(),
+          ],
+        );
+      },
     );
   }
 
-  @override
-  bool shouldRepaint(covariant _NeonCirclePainter oldDelegate) => oldDelegate.percent != percent || oldDelegate.color != color;
-}
-
-class _FlatBarChartPainter extends CustomPainter {
-  final Color accent;
-  _FlatBarChartPainter({required this.accent});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = accent.withValues(alpha: 0.2)
-      ..style = PaintingStyle.fill;
-    final paintActive = Paint()
-      ..color = accent
-      ..style = PaintingStyle.fill;
-
-    final values = [0.4, 0.7, 0.5, 0.9, 0.6, 0.8, 0.7];
-    final double barWidth = size.width / (values.length * 2 - 1);
-
-    for (int i = 0; i < values.length; i++) {
-      final double h = size.height * values[i];
-      final double x = i * barWidth * 2;
-      final double y = size.height - h;
-      final rect = Rect.fromLTWH(x, y, barWidth, h);
-      
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(rect, const Radius.circular(4)),
-        i == 3 ? paintActive : paint,
-      );
-    }
+  // 9. MOCKUP 10 - Monochrome Glass (Frosted Stack Rows)
+  Widget _buildFrostedStackRows(double spacing) {
+    return Column(
+      children: [
+        const DashboardCard(),
+        SizedBox(height: spacing),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 650) {
+              return Column(
+                children: [
+                  const DonutChartCard(),
+                  SizedBox(height: spacing),
+                  const ProductionCard(),
+                ],
+              );
+            }
+            return Row(
+              children: [
+                const Expanded(child: DonutChartCard()),
+                SizedBox(width: spacing),
+                const Expanded(child: ProductionCard()),
+              ],
+            );
+          },
+        ),
+        SizedBox(height: spacing),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 700) {
+              return Column(
+                children: [
+                  const ProjectPanel(),
+                  SizedBox(height: spacing),
+                  const ActivityPanel(),
+                ],
+              );
+            }
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Expanded(child: ProjectPanel()),
+                SizedBox(width: spacing),
+                const Expanded(child: ActivityPanel()),
+              ],
+            );
+          },
+        ),
+      ],
+    );
   }
-
-  @override
-  bool shouldRepaint(covariant _FlatBarChartPainter oldDelegate) => oldDelegate.accent != accent;
-}
-
-class _WaveChartPainter extends CustomPainter {
-  final Color color;
-  _WaveChartPainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color.withValues(alpha: 0.15)
-      ..style = PaintingStyle.fill;
-
-    final linePaint = Paint()
-      ..color = color
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke;
-
-    final path = Path()
-      ..moveTo(0, size.height * 0.7)
-      ..quadraticBezierTo(size.width * 0.25, size.height * 0.3, size.width * 0.5, size.height * 0.6)
-      ..quadraticBezierTo(size.width * 0.75, size.height * 0.9, size.width, size.height * 0.4)
-      ..lineTo(size.width, size.height)
-      ..lineTo(0, size.height)
-      ..close();
-
-    final linePath = Path()
-      ..moveTo(0, size.height * 0.7)
-      ..quadraticBezierTo(size.width * 0.25, size.height * 0.3, size.width * 0.5, size.height * 0.6)
-      ..quadraticBezierTo(size.width * 0.75, size.height * 0.9, size.width, size.height * 0.4);
-
-    canvas.drawPath(path, paint);
-    canvas.drawPath(linePath, linePaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant _WaveChartPainter oldDelegate) => oldDelegate.color != color;
-}
-
-class _SakuraPetalPainter extends CustomPainter {
-  final Color color;
-  _SakuraPetalPainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color.withValues(alpha: 0.2)
-      ..style = PaintingStyle.fill;
-    final paintLine = Paint()
-      ..color = color
-      ..strokeWidth = 1.0
-      ..style = PaintingStyle.stroke;
-
-    final center = Offset(size.width / 2, size.height / 2);
-    final double radius = size.width * 0.3;
-
-    for (int i = 0; i < 5; i++) {
-      final double angle = (2 * math.pi * i / 5) - math.pi / 2;
-      final double px = center.dx + radius * math.cos(angle);
-      final double py = center.dy + radius * math.sin(angle);
-      
-      canvas.drawCircle(Offset(px, py), 12, paint);
-      canvas.drawCircle(Offset(px, py), 12, paintLine);
-    }
-    canvas.drawCircle(center, 8, Paint()..color = Colors.white24);
-  }
-
-  @override
-  bool shouldRepaint(covariant _SakuraPetalPainter oldDelegate) => oldDelegate.color != color;
-}
-
-class _MonoLinePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white30
-      ..strokeWidth = 1.0
-      ..style = PaintingStyle.stroke;
-
-    final linePaint = Paint()
-      ..color = Colors.white
-      ..strokeWidth = 1.5
-      ..style = PaintingStyle.stroke;
-
-    final path = Path()
-      ..moveTo(0, size.height * 0.8)
-      ..lineTo(size.width * 0.2, size.height * 0.2)
-      ..lineTo(size.width * 0.4, size.height * 0.5)
-      ..lineTo(size.width * 0.6, size.height * 0.3)
-      ..lineTo(size.width * 0.8, size.height * 0.7)
-      ..lineTo(size.width, size.height * 0.1);
-
-    canvas.drawLine(Offset(0, size.height * 0.5), Offset(size.width, size.height * 0.5), paint);
-    canvas.drawPath(path, linePaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant _MonoLinePainter oldDelegate) => false;
 }
