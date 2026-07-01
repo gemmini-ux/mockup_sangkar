@@ -81,7 +81,8 @@ class _ThemedDashboardState extends State<ThemedDashboard> {
   Widget _buildSplitColumnLayout(double spacing) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth < 800) {
+        // Elevated breakpoint to 1050px to prevent horizontal overflow in narrow split rows
+        if (constraints.maxWidth < 1050) {
           return Column(
             children: [
               const DashboardCard(),
@@ -136,16 +137,23 @@ class _ThemedDashboardState extends State<ThemedDashboard> {
   Widget _buildThreeColumnBentoGrid(double spacing) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth < 900) {
+        // Elevated breakpoint to 1200px to ensure 3-column rows have plenty of horizontal space
+        if (constraints.maxWidth < 1200) {
           return Column(
             children: [
               const DashboardCard(),
               SizedBox(height: spacing),
               const ProjectPanel(),
               SizedBox(height: spacing),
+              const DonutChartCard(),
+              SizedBox(height: spacing),
               const ProductionCard(),
               SizedBox(height: spacing),
+              const QuickAccessCard(),
+              SizedBox(height: spacing),
               const ActivityPanel(),
+              SizedBox(height: spacing),
+              const NotificationCard(),
             ],
           );
         }
@@ -200,7 +208,8 @@ class _ThemedDashboardState extends State<ThemedDashboard> {
   Widget _buildScheduleActionCentric(double spacing) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth < 800) {
+        // Elevated breakpoint to 1050px
+        if (constraints.maxWidth < 1050) {
           return Column(
             children: [
               const DashboardCard(),
@@ -210,6 +219,8 @@ class _ThemedDashboardState extends State<ThemedDashboard> {
               const QuickAccessCard(),
               SizedBox(height: spacing),
               const ProjectPanel(),
+              SizedBox(height: spacing),
+              const DonutChartCard(),
             ],
           );
         }
@@ -268,7 +279,7 @@ class _ThemedDashboardState extends State<ThemedDashboard> {
           ),
         ),
         const SizedBox(height: 16),
-        // Active Sub-Tab View
+        // Active Sub-Tab View (Single column, so naturally overflow-safe!)
         _dashboardSubTab == 0
             ? Column(
                 children: [
@@ -329,7 +340,8 @@ class _ThemedDashboardState extends State<ThemedDashboard> {
   Widget _buildStaggeredSidebarCards(double spacing) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth < 800) {
+        // Elevated breakpoint to 1050px
+        if (constraints.maxWidth < 1050) {
           return Column(
             children: [
               const DashboardCard(),
@@ -337,6 +349,10 @@ class _ThemedDashboardState extends State<ThemedDashboard> {
               const SchedulePanel(),
               SizedBox(height: spacing),
               const ProjectPanel(),
+              SizedBox(height: spacing),
+              const DonutChartCard(),
+              SizedBox(height: spacing),
+              const QuickAccessCard(),
             ],
           );
         }
@@ -382,7 +398,8 @@ class _ThemedDashboardState extends State<ThemedDashboard> {
         SizedBox(height: spacing),
         LayoutBuilder(
           builder: (context, constraints) {
-            if (constraints.maxWidth < 650) {
+            // Elevated breakpoint to 1000px
+            if (constraints.maxWidth < 1000) {
               return Column(
                 children: [
                   const ProductionCard(),
@@ -403,7 +420,8 @@ class _ThemedDashboardState extends State<ThemedDashboard> {
         SizedBox(height: spacing),
         LayoutBuilder(
           builder: (context, constraints) {
-            if (constraints.maxWidth < 750) {
+            // Elevated breakpoint to 1000px
+            if (constraints.maxWidth < 1000) {
               return Column(
                 children: [
                   const ProjectPanel(),
@@ -431,7 +449,8 @@ class _ThemedDashboardState extends State<ThemedDashboard> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final w = constraints.maxWidth;
-        if (w < 800) {
+        // Elevated breakpoint to 1100px
+        if (w < 1100) {
           return Column(
             children: [
               const DashboardCard(),
@@ -441,6 +460,8 @@ class _ThemedDashboardState extends State<ThemedDashboard> {
               const ProjectPanel(),
               SizedBox(height: spacing),
               const QuickAccessCard(),
+              SizedBox(height: spacing),
+              const ActivityPanel(),
             ],
           );
         }
@@ -478,7 +499,8 @@ class _ThemedDashboardState extends State<ThemedDashboard> {
   Widget _buildCyberTerminalGrid(double spacing) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth < 850) {
+        // Elevated breakpoint to 1050px
+        if (constraints.maxWidth < 1050) {
           return Column(
             children: [
               const QuickAccessCard(),
@@ -488,6 +510,8 @@ class _ThemedDashboardState extends State<ThemedDashboard> {
               const ProductionCard(),
               SizedBox(height: spacing),
               const SchedulePanel(),
+              SizedBox(height: spacing),
+              const ActivityPanel(),
             ],
           );
         }
@@ -526,7 +550,8 @@ class _ThemedDashboardState extends State<ThemedDashboard> {
         SizedBox(height: spacing),
         LayoutBuilder(
           builder: (context, constraints) {
-            if (constraints.maxWidth < 650) {
+            // Elevated breakpoint to 1000px
+            if (constraints.maxWidth < 1000) {
               return Column(
                 children: [
                   const DonutChartCard(),
@@ -547,7 +572,8 @@ class _ThemedDashboardState extends State<ThemedDashboard> {
         SizedBox(height: spacing),
         LayoutBuilder(
           builder: (context, constraints) {
-            if (constraints.maxWidth < 700) {
+            // Elevated breakpoint to 1000px
+            if (constraints.maxWidth < 1000) {
               return Column(
                 children: [
                   const ProjectPanel(),
